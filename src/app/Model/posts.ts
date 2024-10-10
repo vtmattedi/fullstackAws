@@ -33,7 +33,7 @@ const deletePost = async (id: Number) => {
 }
 
 const getPostsByUserId = async (user_id: Number) => {
-    const [posts] = await users_pool.query('SELECT * FROM posts WHERE user_id = ?', [user_id]) as Array<any>;
+    const [posts] = await db_pool.query('SELECT * FROM posts WHERE user_id = ?', [user_id]) as Array<any>;
     return posts;
     
 }

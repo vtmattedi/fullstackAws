@@ -2,6 +2,10 @@ import { configDotenv } from "dotenv";
 
 const assertDotEnv = () => {
     const dotenv = configDotenv();
+    if ( process.env.JWT_REFRESH_SECRET)
+    {
+        return true;
+    }
     if (!dotenv.parsed?.JWT_SECRET) {
         return false;
     }

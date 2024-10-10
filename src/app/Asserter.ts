@@ -4,6 +4,10 @@ const assertDotEnv = () => {
     if (process.env.JWT_SECRET)
         return true;
     const dotenv = configDotenv();
+    if ( process.env.JWT_REFRESH_SECRET)
+    {
+        return true;
+    }
     if (!dotenv.parsed?.JWT_SECRET) {
         return false;
     }

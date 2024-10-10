@@ -5,7 +5,7 @@ Check the project deployed [Here](https://fullstackaws.onrender.com/).
 
 Check the frontend Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
 
-### security
+### Security
 
 It implements JWT, access and refresh tokens using httpOnly and secure cookies.
 

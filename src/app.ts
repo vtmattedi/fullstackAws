@@ -1,6 +1,7 @@
 import express from "express";
 import { authRouter } from "./app/routers/authRouter";
 import { dataRouter } from "./app/routers/backendRouter";
+import { allRouter } from "./app/routers/allInOneRouter";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { assertDotEnv } from "./app/Asserter";
@@ -59,7 +60,7 @@ class BackendServer extends BasicServer {
 class FrontendServer extends BasicServer {
   constructor() {
     super();
-    const p = path.resolve('./build');
+    const p = path.resolve('./front');
     console.log("Static path:", p);
     this.server.use(express.static(p));
   }
@@ -67,4 +68,18 @@ class FrontendServer extends BasicServer {
 
 }
 
-export { FrontendServer, BackendServer, AuthServer }
+class AllInOneServer extends BasicServer {
+  constructor() {
+    super();
+    this.middleware();
+    this.withCookies();
+    this.withcors('*');
+    this.router(allRouter);
+    this.server.use(express.static(path.resolve('./front')));
+    this.server.use('*', (req,res) => {
+      res.sendFile(path.resolve('./front/index.html'))
+      });
+  }
+}
+
+export { FrontendServer, BackendServer, AuthServer, AllInOneServer };

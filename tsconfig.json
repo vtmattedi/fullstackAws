@@ -6,7 +6,7 @@
             "es6"
         ],
         "allowJs": true,
-        "outDir": "build",
+        "outDir": "front",
         "rootDir": "src",
         "strict": true,
         "noImplicitAny": true,

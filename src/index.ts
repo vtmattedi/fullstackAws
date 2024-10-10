@@ -1,4 +1,4 @@
-import { BackendServer, AuthServer, FrontendServer } from "./app"
+import { BackendServer, AuthServer, FrontendServer, AllInOneServer } from "./app"
 import { runSqlFile } from "./app/Model/createdb";
 import { assertDotEnv } from "./app/Asserter";
 
@@ -13,12 +13,7 @@ if (!result) {
 }
 else
     console.log('Database loaded successfully');
-const url = 'https://localhost:'
-console.log("starting Auth server on " + url + process.env.AUTH_PORT)
-const authServer = new AuthServer().server.listen(process.env.AUTH_PORT);
-console.log("starting backend server on " + url + process.env.BACKEND_PORT)
-const backendServer = new BackendServer().server.listen(process.env.BACKEND_PORT);
-console.log("starting frontend server on " + url + process.env.FRONTEND_PORT)
-const frontendServer = new FrontendServer().server.listen(process.env.FRONTEND_PORT);
 
+
+const app = new AllInOneServer().server.listen(process.env.PORT??4500);
 

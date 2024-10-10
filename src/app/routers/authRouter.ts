@@ -10,7 +10,7 @@ authRouter.get("/", (req, res) => {
 authRouter.post("/signup", authController.signUp);
 authRouter.post("/login", authController.login);
 authRouter.delete("/logout", authController.logout);
-authRouter.delete("/logoutEveryone", authController.logout)
+authRouter.delete("/logoutall", authController.logoutFromAll);
 authRouter.post("/token", authController.refreshToken);
 export { authRouter };
 

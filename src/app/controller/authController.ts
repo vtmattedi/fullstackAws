@@ -2,7 +2,7 @@ import { Request, response, Response } from "express";
 import jwt from 'jsonwebtoken';
 import { createUser, getUsersByEmail } from "../Model/user";
 import * as Crypto from 'crypto';
-import { createToken, deleteToken, isTokenValid } from '../Model/refreshtokens';
+import { createToken, deleteToken, isTokenValid, deleteTokenByUserId } from '../Model/refreshtokens';
 import { Asserter, assertDotEnv } from '../Asserter';
 
 
@@ -206,12 +206,39 @@ class AuthController {
             return;
         }
         if (!isTokenValid(refreshToken)) {
+            res.clearCookie('refreshToken');
             res.status(401).send({ message: 'Invalid refresh token.' });
             return;
         }
         deleteToken(refreshToken);
         res.clearCookie('refreshToken');
         res.status(200).send({ message: 'Logout successful.' });
+    }
+
+    public logoutFromAll = async (req: Request, res: Response) => {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            res.status(400).send({ message: 'Refresh token is required.' });
+            return;
+        }
+        if (!isTokenValid(refreshToken)) {
+            res.clearCookie('refreshToken');
+            res.status(401).send({ message: 'Invalid refresh token.' });
+            return;
+        }
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, async (err: any, decoded: any) => {
+            if (err) {
+                res.status(401).send({ message: 'Invalid refresh token.' });
+                return;
+                
+            }
+            const { uid } = decoded;
+            const del_res = await deleteTokenByUserId(uid);
+            res.clearCookie('refreshToken');
+            res.status(200).send({ message: 'Logout successful.', terminated: del_res });
+    
+        });
+
     }
 }
 

@@ -22,6 +22,18 @@ const deleteToken = async (token: String) => {
     );
 }
 
+const deleteTokenByUserId = async (user_id: Number) => {
+    
+    try {
+        const [res] = await db_pool.query('DELETE FROM refreshTokens WHERE user_id = ?', [user_id]) as Array<any>;
+        return res.length;
+    } catch (error) {
+        console.log(error);
+        return 0;
+    }
+
+}
+
 const isTokenValid = async (token: String) => {
   try {
       const [res] = await db_pool.query('SELECT * FROM refreshTokens ', [token]) as Array<any>;
@@ -32,4 +44,4 @@ const isTokenValid = async (token: String) => {
     }
 }
 
-export { createToken, deleteToken, isTokenValid };
+export { createToken, deleteToken, isTokenValid, deleteTokenByUserId };

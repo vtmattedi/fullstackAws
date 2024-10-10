@@ -1,6 +1,8 @@
 import { configDotenv } from "dotenv";
 
 const assertDotEnv = () => {
+    if (process.env.JWT_SECRET)
+        return true;
     const dotenv = configDotenv();
     if (!dotenv.parsed?.JWT_SECRET) {
         return false;

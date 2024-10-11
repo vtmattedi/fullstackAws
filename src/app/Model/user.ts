@@ -1,7 +1,5 @@
 import { db_pool } from './db';
 
-
-
 class User {
     id: Number;
     username: String;

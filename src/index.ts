@@ -14,6 +14,5 @@ if (!result) {
 else
     console.log('Database loaded successfully');
 
-
 const app = new AllInOneServer().server.listen(process.env.PORT??4500);
 

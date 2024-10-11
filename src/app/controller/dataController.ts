@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getUserById, getUsers, getUsersByEmail, User, modifyUser } from '../Model/user';
-import { create } from 'domain';
 import * as Posts from '../Model/posts';
 
 class DataController {
@@ -54,27 +53,7 @@ class DataController {
         }
     }
 
-    handleCreatePost = async (req: Request, res: Response) => {
-        const userId = req.body.uid;
-        const user = (await getUserById(userId));
-        if (!user.found) {
-            res.status(404).send({ message: 'User not found' });
-            return;
-        }
-
-        const { title, content } = req.body;
-        if (!title || !content) {
-            res.status(400).send({ message: 'Title and content are required' });
-            return;
-        }
-        const postId = await Posts.createPoster(title, content, userId);
-        if (!postId) {
-            res.status(500).send({ message: 'Internal Server Error' });
-            return;
-        }
-        res.status(200).send({ message: 'Post created', id: postId });
-
-    }
+   
 }
 
 export const dataController = new DataController();

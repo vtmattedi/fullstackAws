@@ -221,7 +221,7 @@ class AuthController {
             res.status(400).send({ message: 'Refresh token is required.' });
             return;
         }
-        if (!isTokenValid(refreshToken)) {
+        if (!await isTokenValid(refreshToken)) {
             res.clearCookie('refreshToken');
             res.status(401).send({ message: 'Invalid refresh token.' });
             return;

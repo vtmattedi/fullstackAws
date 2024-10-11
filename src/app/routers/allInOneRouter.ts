@@ -11,7 +11,7 @@ allRouter.delete("/auth/logout", authController.logout);
 allRouter.delete("/auth/logoutEveryone", authController.logout)
 allRouter.post("/auth/token", authController.refreshToken);
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
-allRouter.get("/api/others", authMiddleware, dataController.handleGetOthers)
-
+allRouter.get("/api/others", authMiddleware, dataController.handleGetOthers);
+allRouter.post("/api/update", authMiddleware, dataController.handleEditUser);
 export { allRouter };
 

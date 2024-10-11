@@ -75,10 +75,10 @@ class AllInOneServer extends BasicServer {
     this.withCookies();
     this.withcors('http://localhost:' + process.env.FRONTEND_PORT);
     this.router(allRouter);
-    // this.server.use(express.static(path.resolve('./front')));
-    // this.server.use('*', (req,res) => {
-    //   res.sendFile(path.resolve('./front/index.html'))
-    //   });
+    this.server.use(express.static(path.resolve('./front')));
+    this.server.use('*', (req,res) => {
+      res.sendFile(path.resolve('./front/index.html'))
+      });
   }
 }
 

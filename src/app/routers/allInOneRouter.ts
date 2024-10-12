@@ -9,7 +9,7 @@ const allRouter: Router = Router()
 allRouter.post("/auth/signup", authController.signUp);
 allRouter.post("/auth/login", authController.login);
 allRouter.delete("/auth/logout", authController.logout);
-allRouter.delete("/auth/logoutEveryone", authController.logout)
+allRouter.delete("/auth/logoutEveryone", authController.logoutFromAll)
 allRouter.post("/auth/token", authController.refreshToken);
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
 allRouter.get("/api/others", authMiddleware, dataController.handleGetOthers);
@@ -19,6 +19,8 @@ allRouter.delete("/api/deletepost", authMiddleware, postController.handleDeleteP
 allRouter.use("/api/posts",authMiddleware, postController.getPostsByUserId);
 allRouter.use("/api/post/:id",authMiddleware, postController.getPostsByUserId);
 allRouter.use("/api/allposts",authMiddleware, postController.getAllPosts);
+allRouter.get("/api/finduser/:id",authMiddleware, dataController.getUser)
+allRouter.get("/api/finduser",authMiddleware, dataController.getUser)
 
 export { allRouter };
 

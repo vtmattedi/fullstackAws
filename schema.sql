@@ -17,7 +17,7 @@ CREATE Table IF NOT EXISTS refreshTokens (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE Table IF NOT EXISTS Posts (
+CREATE Table IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
     content TEXT,

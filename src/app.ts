@@ -61,7 +61,6 @@ class FrontendServer extends BasicServer {
   constructor() {
     super();
     const p = path.resolve('./front');
-    console.log("Static path:", p);
     this.server.use(express.static(p));
   }
 

@@ -40,7 +40,6 @@ class PostController {
         }
 
         if (post.post.user_id !== uid) {
-            console.log('post.post.user_id:', post.post.user_id, uid);
             res.status(403).send({ message: 'Unauthorized' });
             return;
         }
@@ -60,15 +59,12 @@ class PostController {
         const {uid} = req.body;
         let targetid = parseInt(req.params.id);
         const path = req.url;
-        console.log('path:', path);
+ 
         const num = parseInt(path.substring(1));
         if (!isNaN(num)) {
             targetid = num;
         }
-        
-        console.log('num', parseInt(path.substring(1)));  
-        console.log('uid:', req.params);
-        console.log('targetid:', targetid, req.body);
+        ;
         if (targetid)
         {
             const posts = await Posts.getPostsByUserId(targetid);

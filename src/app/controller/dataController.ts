@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import { getUserById, getUsers, getUsersByEmail, User, modifyUser } from '../Model/user';
+import { getUserById, getUsers, getUsersByEmail, User, modifyUser, searchUser } from '../Model/user';
 import * as Posts from '../Model/posts';
+import { url } from 'inspector';
 
 class DataController {
     handleUserById = async (req: Request, res: Response) => {
-        console.log(req.body);
+
         const userId = req.body.uid;
         const user = (await getUserById(userId));
         if (!user.found) {
@@ -53,7 +54,22 @@ class DataController {
         }
     }
 
-   
+    getUser = async (req: Request, res: Response) => {
+
+        const user_search = req.url.substring(req.url.lastIndexOf('/') + 1);
+        if (!user_search || user_search.length < 2) {
+            res.status(200).send({ users: [] });
+            return;
+        }
+        const users = await searchUser(user_search) as Array<User>;
+        res.status(200).send({
+            users: users.map((user) => {
+                return { user: user.username, email: user.email, id: user.id, created_at: user.created_at };
+            })
+        });
+    }
+
+
 }
 
 export const dataController = new DataController();

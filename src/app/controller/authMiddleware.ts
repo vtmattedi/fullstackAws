@@ -4,6 +4,7 @@ import { assertDotEnv } from '../Asserter';
 
 const authMiddleware = (req: Request, res: Response, next?: NextFunction) => {
     const token = req.header('authorization')?.replace('Bearer ', '');
+    
     if (!assertDotEnv())
     {
         res.status(500).send({ error: 'Internal Server Error 065' });

@@ -21,10 +21,13 @@ const getUsers =  async () => {
     return users;
 }
 
+const searchUser = async (username: String) => {
+    const searchTerm = `${username}`;
+    const [user] = await db_pool.query("SELECT * FROM users WHERE username LIKE CONCAT('%', ?, '%')", [searchTerm]) as Array<any>;
+    return user;
+}
+
 const createUser = async (username: String, password: String, email:String) => {
-    console.log(`username`, username);
-    console.log(password)
-    console.log(email)
     const [result] = await db_pool.query('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, password, email]) as any;
     return (result.insertId);
 }
@@ -47,4 +50,4 @@ const modifyUser = async (id: Number, username: String, email: String) => {
 
 
 
-export { getUsers, createUser, getUsersByEmail, getUserById, User, modifyUser };
+export { getUsers, createUser, getUsersByEmail, getUserById, User, modifyUser,searchUser };

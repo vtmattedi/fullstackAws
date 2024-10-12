@@ -26,7 +26,7 @@ const deleteTokenByUserId = async (user_id: Number) => {
     
     try {
         const [res] = await db_pool.query('DELETE FROM refreshTokens WHERE user_id = ?', [user_id]) as Array<any>;
-        return res.length;
+        return res.affectedRows;
     } catch (error) {
         console.log(error);
         return 0;

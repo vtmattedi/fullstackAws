@@ -25,8 +25,7 @@ const deletePostById = async (id: Number) => {
     try {
         const [res] = await db_pool.query('DELETE FROM posts WHERE id = ?', [id]) as Array<any>;
         {
-            console.log("RES: ");
-            console.log(res);
+      
             if (res.length === 0) {
                 return false;
             }

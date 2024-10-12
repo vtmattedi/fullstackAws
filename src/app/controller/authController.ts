@@ -1,4 +1,4 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import { createUser, getUsersByEmail } from "../Model/user";
 import * as Crypto from 'crypto';
@@ -101,8 +101,8 @@ class AuthController {
     }
 
     public login = async (req: Request, res: Response) => {
-        console.log("cookies", req.cookies);
-        console.log("signed cookies", req.signedCookies);
+        // console.log("cookies", req.cookies);
+        // console.log("signed cookies", req.signedCookies);
         if (!assertDotEnv()) {
             res.status(500).send({ message: 'Internal Server Error 065' });
             throw new Error('dot env failed to load');
@@ -117,7 +117,7 @@ class AuthController {
 
         // Change this. class only for testing
         if (!users.found) {
-            res.status(404).send({ message: 'email:User not found.' });
+            res.status(404).send({ message: 'creds:User or Password invalid.' });
             return;
         }
         Crypto.scrypt(password, process.env.SCRYPT_SALT as string, 64, async (err, derivedKey) => {
@@ -143,7 +143,7 @@ class AuthController {
                 res.send();
             }
             else {
-                res.status(401).json({ message: 'password:Wrong password.' });
+                res.status(401).json({ message: 'creds:User or Password invalid.' });
             }
         });
     }
@@ -153,9 +153,8 @@ class AuthController {
             res.status(500).send({ message: 'Internal Server Error 065' });
             throw new Error('dot env failed to load');
         }
-        console.log("route", req.url, req.originalUrl);
         const { refreshToken } = req.cookies;
-        console.log("refreshToken", refreshToken);
+
 
         if (!refreshToken) {
             res.status(400).send({ message: 'Refresh token is required.' });
@@ -201,6 +200,7 @@ class AuthController {
 
     public logout = async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
+        
         if (!refreshToken) {
             res.status(400).send({ message: 'Refresh token is required.' });
             return;
@@ -234,6 +234,7 @@ class AuthController {
             }
             const { uid } = decoded;
             const del_res = await deleteTokenByUserId(uid);
+            
             res.clearCookie('refreshToken');
             res.status(200).send({ message: 'Logout successful.', terminated: del_res });
     

@@ -21,6 +21,10 @@ allRouter.use("/api/post/:id",authMiddleware, postController.getPostsByUserId);
 allRouter.use("/api/allposts",authMiddleware, postController.getAllPosts);
 allRouter.get("/api/finduser/:id",authMiddleware, dataController.getUser)
 allRouter.get("/api/finduser",authMiddleware, dataController.getUser)
+allRouter.use("/api/healtz", (req, res) => {
+    res.status(200).send("OK");
+});
+
 
 export { allRouter };
 

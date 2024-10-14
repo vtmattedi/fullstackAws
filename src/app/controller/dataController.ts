@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { getUserById, getUsers, getUsersByEmail, User, modifyUser, searchUser } from '../Model/user';
+import { getUserById, getUsers, getUsersByEmail, User, modifyUser, searchUser,deleteUser } from '../Model/user';
+import {deleteTokenByUserId} from '../Model/refreshtokens';
 import * as Posts from '../Model/posts';
 import { url } from 'inspector';
 
@@ -24,6 +25,26 @@ class DataController {
             return { user: user.username, email: user.email, id: user.id, created_at: user.created_at };
         });
         res.status(200).send({ users: otherUsers });
+    }
+
+    handleUserInfoById = async (req: Request, res: Response) => {
+        const user_search = req.url.substring(req.url.lastIndexOf('/') + 1);
+        if (!user_search) {
+            res.status(400).send({ message: 'No user provided' });
+            return;
+        }
+        const userId = parseInt(user_search);
+        if (!userId) {
+            res.status(400).send({ message: 'Invalid user id' });
+            return;
+        }
+        const user = (await getUserById(userId));
+        if (!user.found) {
+            res.status(404).send({ message: 'User not found' });
+            return;
+        }
+        else
+            res.status(200).send({ user: user.user.username, email: user.user.email, id: user.user.id, created_at: user.user.created_at });
     }
 
     handleEditUser = async (req: Request, res: Response) => {
@@ -69,7 +90,25 @@ class DataController {
         });
     }
 
+     deleteUser = async (req: Request, res: Response) => {
+        const userId = req.body.uid;
+        const user = (await getUserById(userId));
+        if (!user.found) {
+            res.status(404).send({ message: 'User not found' });
+            return;
+        }
+        const result = await deleteUser(userId);
+        const deleteTokenByUserIdResult = await deleteTokenByUserId(userId);
+        
+        
+        if (result) {
+            res.status(200).send({ message: 'User deleted' });
+        }
+        else {
+            res.status(500).send({ message: 'Internal Server Error' });
+        }
 
+    }
 }
 
 export const dataController = new DataController();

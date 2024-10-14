@@ -1,4 +1,8 @@
 import { db_pool } from './db';
+import { UsernameLookup } from './UsernameLookup';
+
+
+
 
 class User {
     id: Number;
@@ -29,6 +33,7 @@ const searchUser = async (username: String) => {
 
 const createUser = async (username: String, password: String, email:String) => {
     const [result] = await db_pool.query('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, password, email]) as any;
+    UsernameLookup.addUsername(result.insertId, username);
     return (result.insertId);
 }
 
@@ -45,9 +50,17 @@ const getUserById = async (id: Number) => {
 
 const modifyUser = async (id: Number, username: String, email: String) => {
     const [result] = await db_pool.query('UPDATE users SET username = ?, email = ? WHERE id = ?', [username, email, id]) as any;
+    UsernameLookup.editUsername(id,username);
+    return result.affectedRows > 0;
+}
+
+const deleteUser = async (id: Number) => {
+    const [result] = await db_pool.query('DELETE FROM users WHERE id = ?', [id]) as any;
+    UsernameLookup.deleteUsername(id);
     return result.affectedRows > 0;
 }
 
 
 
-export { getUsers, createUser, getUsersByEmail, getUserById, User, modifyUser,searchUser };
+
+export { getUsers, createUser, getUsersByEmail, getUserById, User, modifyUser,searchUser ,deleteUser};

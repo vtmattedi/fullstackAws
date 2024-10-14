@@ -1,4 +1,5 @@
 import { db_pool } from "./db";
+import { UsernameLookup } from '../Model/UsernameLookup';
 
 class Post {
     id: Number;
@@ -14,6 +15,11 @@ class Post {
         this.user_id = user_id;
         this.created_at = created_at;
     }
+
+    static createPostWithUsername({ id, title, content, user_id, created_at }: any) {
+        return { id, title, content, user_id, created_at, username: UsernameLookup.getUsername(user_id) }; 
+    }
+
 }
 
 const createPost = async (title: String, content: String, user_id: Number) => {
@@ -39,15 +45,14 @@ const deletePostById = async (id: Number) => {
 }
 
 const getPostsByUserId = async (user_id: Number) => {
-    const [posts] = await db_pool.query('SELECT * FROM posts WHERE user_id = ?', [user_id]) as Array<any>;
-    return posts;
-
+    const [posts] = await db_pool.query('SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC', [user_id]) as Array<any>;
+    return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
 }
 
 const getPostById = async (id: Number) => {
     try {
         const [post] = await db_pool.query('SELECT * FROM posts WHERE id = ?', [id]) as Array<any>;
-        return { found: post.length > 0, post: post[0] };
+        return { found: post.length > 0, post: Post.createPostWithUsername(post[0]) };
     }
     catch (err) {
         console.log(err);
@@ -55,11 +60,25 @@ const getPostById = async (id: Number) => {
     }
 }
 
-const getAllPosts = async () => {
+const getAllPosts = async (size?: Number) => {
     {
-        const [posts] = await db_pool.query('SELECT * FROM posts') as Array<any>;
-        return posts;
+        const [posts] = await db_pool.query('SELECT * from posts ORDER BY created_at DESC LIMIT ?', [size]) as Array<any>;
+        return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
     }
 }
 
-export { createPost, deletePostById, getPostsByUserId, Post, getPostById, getAllPosts };
+const getNewPosts = async (lastId?: Number) => {
+    {
+        const [posts] = await db_pool.query('SELECT * from posts WHERE id > ? ORDER BY created_at DESC', [lastId]) as Array<any>;
+        return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
+    }
+}
+
+const getNewPostsByUserId = async (user_id: Number, lastId?: Number) => {
+    {
+        const [posts] = await db_pool.query('SELECT * from posts WHERE id > ? AND user_id = ? ORDER BY created_at DESC', [lastId, user_id]) as Array<any>;
+        return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
+    }
+}
+
+export { createPost, deletePostById, getPostsByUserId, Post, getPostById, getAllPosts, getNewPosts, getNewPostsByUserId };

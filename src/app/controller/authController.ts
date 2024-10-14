@@ -177,12 +177,13 @@ class AuthController {
             const tokenValid = await isTokenValid(refreshToken);
             if (!tokenValid) {
                 console.log("Invalid token: ", refreshToken);
-                res.status(403).send({ message: 'Invalid refresh token.' });
+                res.status(401).send({ message: 'Invalid refresh token.' });
                 return;
             }
             let tokens: any = {};
             const accessToken = issueAcesstoken(uid);
             tokens.accessToken = accessToken;
+            tokens.uid = uid;
             const refreshRefreshToken = 15 * 60 * 1000; // 15 minutes
             if (exp * 1000 - Date.now() < refreshRefreshToken) {
                 const newRefreshToken = await issueRefreshToken(uid);

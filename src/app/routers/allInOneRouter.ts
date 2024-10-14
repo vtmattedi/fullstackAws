@@ -15,6 +15,7 @@ allRouter.post("/auth/token", authController.refreshToken);
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
 allRouter.post("/api/update", authMiddleware, dataController.handleEditUser);
 allRouter.post("/api/newpost", authMiddleware, postController.handleCreatePost);
+allRouter.put("/api/editpost", authMiddleware, postController.handleEditPost);
 allRouter.delete("/api/deletepost", authMiddleware, postController.handleDeletePost);
 allRouter.use("/api/posts",authMiddleware, postController.getPostsByUserId);
 allRouter.use("/api/post/:id",authMiddleware, postController.getPostsByUserId);

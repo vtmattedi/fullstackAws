@@ -81,4 +81,9 @@ const getNewPostsByUserId = async (user_id: Number, lastId?: Number) => {
     }
 }
 
-export { createPost, deletePostById, getPostsByUserId, Post, getPostById, getAllPosts, getNewPosts, getNewPostsByUserId };
+const editpost = async (id: Number, title: String, content: String) => {
+    const [result] = await db_pool.query('UPDATE posts SET title = ?, content = ? WHERE id = ?', [title, content, id]) as any;
+    return (result.affectedRows > 0);
+}
+
+export { createPost, deletePostById, getPostsByUserId, Post, getPostById, getAllPosts, getNewPosts, getNewPostsByUserId, editpost};

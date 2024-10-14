@@ -13,7 +13,7 @@ class PostController {
         const { uid } = req.body;
         const { postId, title, content } = req.body;
         console.log('edit post:', postId, title, content);
-        if (!postId) {
+        if (!postId || postId < 0) {
             res.status(400).send({ message: 'Post id is required' });
             return;
         }
@@ -28,7 +28,10 @@ class PostController {
             res.status(403).send({ message: 'Unauthorized' });
             return;
         }
-
+        if (!title || !content) {
+            res.status(400).send({ message: 'Title and content are required' });
+            return;
+        }
         const updated = await Posts.editpost(parseInt(postId as string), title, content);
         if (!updated) {
             res.status(500).send({ message: 'Internal Server Error' });

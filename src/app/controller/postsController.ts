@@ -1,14 +1,67 @@
+
 import { Request, Response } from 'express';
 import { getUserById } from '../Model/user';
 import * as Posts from '../Model/posts';
 import { parse } from 'path';
 
+
+/**
+ * Interface representing a deleted post.
+ * @property {Number} id - The unique identifier of the deleted post.
+ * @property {Date} when - The date and time when the post was deleted.
+ */
 interface deletedPost {
     id: Number,
     when: Date
 }
+// Keep track of the id of deleted posts
 const deletedPostsId: Array<deletedPost> = []
+
+/**
+ * The PostController class handles various operations related to posts, including creating, editing, deleting, and retrieving posts.
+ * 
+ * @class
+ * 
+ * @remarks
+ * This class includes methods to:
+ * - Edit a post (`handleEditPost`)
+ * - Create a new post (`handleCreatePost`)
+ * - Delete a post (`handleDeletePost`)
+ * - Retrieve posts by user ID (`getPostsByUserId`)
+ * - Retrieve all posts (`getAllPosts`)
+ * - Retrieve new posts (`getNewPosts`)
+ * 
+ * Each method validates the request, performs the necessary operations, and sends appropriate HTTP responses.
+ * 
+ * @example
+ * // Example usage:
+ * const postController = new PostController();
+ * 
+ * // Express route handlers
+ * app.post('/editPost', postController.handleEditPost);
+ * app.post('/createPost', postController.handleCreatePost);
+ * app.delete('/deletePost', postController.handleDeletePost);
+ * app.get('/posts/:id', postController.getPostsByUserId);
+ * app.get('/allPosts', postController.getAllPosts);
+ * app.get('/newPosts', postController.getNewPosts);
+ */
+
 class PostController {
+
+    /**
+    * Handles the request to edit a post.
+    * 
+    * @param req - The request object containing the post details and user ID.
+    * @param res - The response object used to send back the desired HTTP response.
+    * 
+    * @remarks
+    * - Validates the presence of `postId`, `title`, and `content` in the request body.
+    * - Checks if the post exists and if the user is authorized to edit it.
+    * - Updates the post with the new title and content.
+    * - Sends appropriate HTTP responses based on the validation and update results.
+    * 
+    * @returns A JSON response indicating the success or failure of the post update operation.
+    */
     handleEditPost = async (req: Request, res: Response) => {
         const { uid } = req.body;
         const { postId, title, content } = req.body;
@@ -38,9 +91,23 @@ class PostController {
             return;
         }
         res.status(200).send({ message: 'Post updated' });
-    
+
     }
 
+    /**
+    * Handles the request to create a new post.
+    * 
+    * @param req - The request object containing the post details and user ID.
+    * @param res - The response object used to send back the desired HTTP response.
+    * 
+    * @remarks
+    * - Validates the presence of `title` and `content` in the request body.
+    * - Checks if the user exists and is authorized to create a post.
+    * - Creates a new post with the provided title and content.
+    * - Sends appropriate HTTP responses based on the validation and creation results.
+    * 
+    * @returns A JSON response indicating the success or failure of the post creation operation, including the new post ID if successful.
+    */
     handleCreatePost = async (req: Request, res: Response) => {
         const userId = req.body.uid;
         const user = (await getUserById(userId));
@@ -63,9 +130,23 @@ class PostController {
 
     }
 
+    /**
+    * Handles the request to delete a post.
+    * 
+    * @param req - The request object containing the post ID and user ID.
+    * @param res - The response object used to send back the desired HTTP response.
+    * 
+    * @remarks
+    * - Validates the presence of `postId` in the request query.
+    * - Checks if the post exists and if the user is authorized to delete it.
+    * - Deletes the post if validation passes.
+    * - Sends appropriate HTTP responses based on the validation and deletion results.
+    * 
+    * @returns A JSON response indicating the success or failure of the post deletion operation.
+    */
     handleDeletePost = async (req: Request, res: Response) => {
         const { uid } = req.body;
-        const {postId} = req.query;
+        const { postId } = req.query;
         if (!postId) {
             res.status(400).send({ message: 'Post id is required' });
             return;
@@ -92,7 +173,19 @@ class PostController {
         console.log('adding post delete:', deletedPostsId.length);
         res.status(200).send({ message: 'Post deleted' });
     }
-
+    
+    /**
+     * Retrieves posts by user ID.
+     *
+     * This asynchronous function handles HTTP GET requests to fetch posts associated with a specific user ID.
+     * The user ID can be provided either in the request body (`uid`) or as a parameter in the URL path.
+     * If the user ID is found in the URL path, it takes precedence over the ID in the request body.
+     *
+     * @param req - The HTTP request object, containing the user ID in the body or as a URL parameter.
+     * @param res - The HTTP response object, used to send back the retrieved posts.
+     *
+     * @returns A promise that resolves to sending an HTTP response with the retrieved posts.
+     */
     getPostsByUserId = async (req: Request, res: Response) => {
         const { uid } = req.body;
         let targetid = parseInt(req.params.id);
@@ -112,6 +205,17 @@ class PostController {
         res.status(200).send({ posts });
     }
 
+    /**
+     * Retrieves all posts from the database.
+     * 
+     * @param req - The request object, containing query parameters.
+     * @param res - The response object used to send back the desired HTTP response.
+     * 
+     * @remarks
+     * If a `size` query parameter is provided, it will limit the number of posts returned.
+     * 
+     * @returns A JSON response containing the list of posts.
+     */
     getAllPosts = async (req: Request, res: Response) => {
         const { size } = req.query;
         if (size) {
@@ -123,11 +227,24 @@ class PostController {
         res.status(200).send({ posts });
     }
 
+    /**
+    * Retrieves new posts from the database.
+    * 
+    * @param req - The request object, containing query parameters `targetId` and `lastId`.
+    * @param res - The response object used to send back the desired HTTP response.
+    * 
+    * @remarks
+    * - If both `targetId` and `lastId` query parameters are provided, it will return new posts for the specified user since the last post ID.
+    * - If only `lastId` is provided, it will return new posts since the last post ID.
+    * - If neither parameter is provided, it will return a 400 status with an 'Invalid request' message.
+    * 
+    * @returns A JSON response containing the list of new posts and the list of deleted post IDs.
+    */
     getNewPosts = async (req: Request, res: Response) => {
         const { targetId, lastId } = req.query;
         if (targetId && lastId) {
             const posts = await Posts.getNewPostsByUserId(parseInt(targetId as string), parseInt(lastId as string));
-            res.status(200).send({ posts: posts, deleted: deletedPostsId.map((post) => post.id) }); 
+            res.status(200).send({ posts: posts, deleted: deletedPostsId.map((post) => post.id) });
         }
         else if (lastId) {
             const posts = await Posts.getNewPosts(parseInt(lastId as string));

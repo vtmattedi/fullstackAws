@@ -10,7 +10,7 @@ allRouter.post("/auth/signup", authController.signUp);
 allRouter.post("/auth/login", authController.login);
 allRouter.delete("/auth/logout", authController.logout);
 allRouter.delete("/auth/logoutEveryone", authController.logoutFromAll)
-allRouter.delete("/auth/deleteuser",authMiddleware, dataController.deleteUser);
+allRouter.delete("/api/deleteuser",authMiddleware, dataController.deleteUser);
 allRouter.post("/auth/token", authController.refreshToken);
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
 allRouter.post("/api/update", authMiddleware, dataController.handleEditUser);

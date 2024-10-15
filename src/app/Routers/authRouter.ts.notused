@@ -1,0 +1,15 @@
+/*If you decide to go with 3 separate servers, this would be a router for the auth server*/
+
+import { Router } from "express";
+import {authController} from "../controller/authController";
+const authRouter: Router = Router()
+authRouter.get("/", (req, res) => {
+    res.send("Hello World");
+});
+authRouter.post("/signup", authController.signUp);
+authRouter.post("/login", authController.login);
+authRouter.delete("/logout", authController.logout);
+authRouter.delete("/logoutall", authController.logoutFromAll);
+authRouter.post("/token", authController.refreshToken);
+export { authRouter };
+

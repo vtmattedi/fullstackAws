@@ -1,8 +1,13 @@
 import * as fs from 'fs';
-import mysql from 'mysql2';
 import { assertDotEnv } from '../Asserter';
 import  { db_pool } from './db';
 
+/**
+ * Runs a sql file.
+ * 
+ * @param {string} filePath - The path to the sql file.
+ * @returns { Promise<boolean>} - The result of the operation.
+ */
 const runSqlFile = async (filePath: string) => {
     if (!assertDotEnv()) {
         console.log('Error creating database: .env file not found');

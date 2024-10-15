@@ -1,6 +1,7 @@
 import { db_pool } from "./db";
 import { UsernameLookup } from '../Model/UsernameLookup';
 
+// Class representing a post from the db
 class Post {
     id: Number;
     title: String;
@@ -22,11 +23,13 @@ class Post {
 
 }
 
+// Create a post
 const createPost = async (title: String, content: String, user_id: Number) => {
     const [result] = await db_pool.query('INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)', [title, content, user_id]) as any;
     return (result.insertId);
 };
 
+// Delete a post
 const deletePostById = async (id: Number) => {
     try {
         const [res] = await db_pool.query('DELETE FROM posts WHERE id = ?', [id]) as Array<any>;
@@ -44,11 +47,13 @@ const deletePostById = async (id: Number) => {
     }
 }
 
+// Get all posts by a user
 const getPostsByUserId = async (user_id: Number) => {
     const [posts] = await db_pool.query('SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC', [user_id]) as Array<any>;
     return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
 }
 
+// Get a post by its post id
 const getPostById = async (id: Number) => {
     try {
         const [post] = await db_pool.query('SELECT * FROM posts WHERE id = ?', [id]) as Array<any>;
@@ -60,6 +65,7 @@ const getPostById = async (id: Number) => {
     }
 }
 
+// Get all posts
 const getAllPosts = async (size?: Number) => {
     {
         const [posts] = await db_pool.query('SELECT * from posts ORDER BY created_at DESC LIMIT ?', [size]) as Array<any>;
@@ -67,6 +73,7 @@ const getAllPosts = async (size?: Number) => {
     }
 }
 
+// Get new posts
 const getNewPosts = async (lastId?: Number) => {
     {
         const [posts] = await db_pool.query('SELECT * from posts WHERE id > ? ORDER BY created_at DESC', [lastId]) as Array<any>;
@@ -74,6 +81,7 @@ const getNewPosts = async (lastId?: Number) => {
     }
 }
 
+// Get new posts by a user
 const getNewPostsByUserId = async (user_id: Number, lastId?: Number) => {
     {
         const [posts] = await db_pool.query('SELECT * from posts WHERE id > ? AND user_id = ? ORDER BY created_at DESC', [lastId, user_id]) as Array<any>;
@@ -81,6 +89,7 @@ const getNewPostsByUserId = async (user_id: Number, lastId?: Number) => {
     }
 }
 
+// Edit a post
 const editpost = async (id: Number, title: String, content: String) => {
     const [result] = await db_pool.query('UPDATE posts SET title = ?, content = ? WHERE id = ?', [title, content, id]) as any;
     return (result.affectedRows > 0);

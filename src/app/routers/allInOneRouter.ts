@@ -1,19 +1,25 @@
+/*Routes every service provided by the server */
+
 import { Router } from "express";
-import {authController} from "../controller/authController";
-import {dataController} from "../controller/dataController";
-import {postController} from "../controller/postsController";
-import authMiddleware from "../controller/authMiddleware";
+import {authController} from "../Controller/authController"; //Controller for auth requests
+import {dataController} from "../Controller/dataController"; //Controller for data requests
+import {postController} from "../Controller/postsController"; ////Controller for post requests
+import authMiddleware from "../Controller/authMiddleware"; //Middleware for autthetication
+
+/* 'All in one' Router, may need to be splitted when scaling*/
 const allRouter: Router = Router()
 
-//Routes
+/*Authentication routes*/
 allRouter.post("/auth/signup", authController.signUp);
 allRouter.post("/auth/login", authController.login);
 allRouter.delete("/auth/logout", authController.logout);
 allRouter.delete("/auth/logoutEveryone", authController.logoutFromAll)
 allRouter.delete("/api/deleteuser",authMiddleware, dataController.deleteUser);
 allRouter.post("/auth/token", authController.refreshToken);
+
+/*Api Requests*/
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
-allRouter.post("/api/update", authMiddleware, dataController.handleEditUser);
+allRouter.post("/api/edituser", authMiddleware, dataController.handleEditUser);
 allRouter.post("/api/newpost", authMiddleware, postController.handleCreatePost);
 allRouter.put("/api/editpost", authMiddleware, postController.handleEditPost);
 allRouter.delete("/api/deletepost", authMiddleware, postController.handleDeletePost);

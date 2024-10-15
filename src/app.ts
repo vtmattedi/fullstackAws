@@ -1,11 +1,12 @@
 import express from "express";
-import { authRouter } from "./app/routers/authRouter";
-import { dataRouter } from "./app/routers/backendRouter";
-import { allRouter } from "./app/routers/allInOneRouter";
+import { allRouter } from "./app/Routers/allInOneRouter";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { assertDotEnv } from "./app/Asserter";
 import * as path from "path";
+
+/*Here I created a basic server because I could have 3 separated server, front, api, and auth*/
+/*But for constrains in the hosting plataform, I have decided to make only one server*/
+/*The big advantage of having 3 servers is that you could scale them separately */
 
 class BasicServer {
   public server: express.Application;
@@ -34,46 +35,15 @@ class BasicServer {
   }
 }
 
-class AuthServer extends BasicServer {
-  constructor() {
-    if (!assertDotEnv) {
-      console.log('failed to load .env file');
-      throw new Error('failed to load .env file');
-    }
-    super();
-    this.middleware();
-    this.withCookies();
-    this.withcors('http://localhost:' + process.env.FRONTEND_PORT);
-    this.router(authRouter);
-  }
-}
-
-class BackendServer extends BasicServer {
-  constructor() {
-    super();
-    this.middleware();
-    this.withcors('http://localhost:' + process.env.FRONTEND_PORT);
-    this.router(dataRouter);
-  }
-}
-
-class FrontendServer extends BasicServer {
-  constructor() {
-    super();
-    const p = path.resolve('./front');
-    this.server.use(express.static(p));
-  }
-
-
-}
-
 class AllInOneServer extends BasicServer {
   constructor() {
     super();
     this.middleware();
     this.withCookies();
     this.withcors('http://localhost:' + process.env.FRONTEND_PORT);
-    this.router(allRouter);
+    this.router(allRouter); /*Router for Apis + Auth*/
+
+    /*Serves the React Page*/
     this.server.use(express.static(path.resolve('./front')));
     this.server.use('*', (req,res) => {
       res.sendFile(path.resolve('./front/index.html'))
@@ -81,4 +51,43 @@ class AllInOneServer extends BasicServer {
   }
 }
 
-export { FrontendServer, BackendServer, AuthServer, AllInOneServer };
+
+export { AllInOneServer };
+
+
+/*Three Servers Example*/
+
+// class AuthServer extends BasicServer {
+//   constructor() {
+//     if (!assertDotEnv) {
+//       console.log('failed to load .env file');
+//       throw new Error('failed to load .env file');
+//     }
+//     super();
+//     this.middleware();
+//     this.withCookies();
+//     this.withcors('http://localhost:' + process.env.FRONTEND_PORT);
+//     this.router(authRouter);
+//   }
+// }
+
+// class BackendServer extends BasicServer {
+//   constructor() {
+//     super();
+//     this.middleware();
+//     this.withcors('http://localhost:' + process.env.FRONTEND_PORT);
+//     this.router(dataRouter);
+//   }
+// }
+
+// class FrontendServer extends BasicServer {
+//   constructor() {
+//     super();
+//     const p = path.resolve('./front');
+//     this.server.use(express.static(p));
+//   }
+
+
+// }
+
+//export { FrontendServer, AuthServer, BackendServer, AllInOneServer };

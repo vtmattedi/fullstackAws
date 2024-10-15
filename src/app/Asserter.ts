@@ -1,6 +1,14 @@
+
+
 import { configDotenv } from "dotenv";
 
+/**
+ * Asserts the presence of required environment variables.
+ * 
+ * @returns {boolean} - Returns true if all required environment variables are present, otherwise false.
+ */
 const assertDotEnv = () => {
+    // check if the environment variables are already set
     if (process.env.JWT_SECRET)
         return true;
     const dotenv = configDotenv();
@@ -32,12 +40,31 @@ const assertDotEnv = () => {
     return true;
 };
 
+/**
+ * Interface representing the result of a validation.
+ */
 interface IResult {
+    /**
+     * The result of the validation.
+     */
     result: boolean;
+    
+    /**
+     * The message associated with the validation result.
+     */
     message: string;
 }
 
+ /**
+ * A class containing static methods for validating email, password, and username.
+ */
 class Asserter {
+     /**
+     * Validates an email address.
+     * 
+     * @param {string} email - The email address to validate.
+     * @returns {IResult} - The result of the validation.
+     */
     public static email = (email: string) => {
         let result: IResult = { result: false, message: "" };
         if (!email)
@@ -62,6 +89,13 @@ class Asserter {
         result.message = errors;
         return result;
     }
+
+    /**
+     * Validates a password.
+     * 
+     * @param {string} password - The password to validate.
+     * @returns {IResult} - The result of the validation.
+     */
     public static password = (password: string) => {
         let result: IResult = { result: false, message: "" };
         if (!password)
@@ -81,6 +115,13 @@ class Asserter {
         return result;
     }
 
+    
+    /**
+     * Validates a username.
+     * 
+     * @param {string} username - The username to validate.
+     * @returns {IResult} - The result of the validation.
+     */
     public static username = (username: string) => {
         let result: IResult = { result: false, message: "" };
         if (!username)

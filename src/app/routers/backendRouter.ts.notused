@@ -1,3 +1,6 @@
+/*If you decide to go with 3 separate servers, this would be a router for the back-end api server*/
+
+
 import { Router } from "express";
 import authMiddleware from "../controller/authMiddleware";
 import {dataController} from "../controller/dataController";

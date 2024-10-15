@@ -2,9 +2,10 @@
 
 import { Request, Response } from 'express';
 import { getUserById, getUsers, getUsersByEmail, User, modifyUser, searchUser, deleteUser } from '../Model/user';
-import { deleteTokenByUserId, getTokens } from '../Model/refreshtokens';
+import { deleteTokenByUserId } from '../Model/refreshtokens';
 import * as Posts from '../Model/posts';
 import { url } from 'inspector';
+import { Asserter } from '../Asserter';
 
 class DataController {
 
@@ -92,10 +93,20 @@ class DataController {
         }
         if (email) {
             const find_res = await getUsersByEmail(email);
+            const emailValidation = Asserter.email(email);
             if (find_res.found && find_res.user[0].id !== userId) {
                 res.status(400).send({ message: 'Email already registered' });
                 return;
             }
+            else if (!emailValidation.result) {
+                res.status(400).send({ message: emailValidation.message });
+                return;
+            }
+        }
+        const userNameValidation = Asserter.username(username);
+        if (!userNameValidation.result) {
+            res.status(400).send({ message: userNameValidation.message });
+            return;
         }
         const result = await modifyUser(userId, username || user.user.username, email || user.user.email);
         if (result) {

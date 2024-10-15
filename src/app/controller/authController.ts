@@ -1,3 +1,4 @@
+
 import { Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import { createUser, getUsersByEmail } from "../Model/user";
@@ -6,10 +7,12 @@ import { createToken, deleteToken, isTokenValid, deleteTokenByUserId } from '../
 import { Asserter, assertDotEnv } from '../Asserter';
 
 
+// Issue a new access token to a user with 15 seconds expiration
 const issueAcesstoken = (uid: string) => {
     return jwt.sign({ uid: uid }, process.env.JWT_SECRET as string, { expiresIn: '15s' });
 }
 
+// Issue a new refresh token to a user with 72 hours expiration
 const issueRefreshToken = async (uid: number) => {
     const refreshToken = jwt.sign({ uid: uid }, process.env.JWT_REFRESH_SECRET as string,
         { expiresIn: '72h' });
@@ -20,8 +23,17 @@ const issueRefreshToken = async (uid: number) => {
 
 
 
+/**
+ * AuthController class handles user authentication operations such as sign-up, login, token refresh, and logout.
+ */
 class AuthController {
 
+    /**
+    * Handles user sign-up by validating input, checking for existing users, hashing the password, and issuing tokens.
+    * 
+    * @param req - Express request object containing username, password, and email in the body.
+    * @param res - Express response object used to send responses to the client.
+    */
     public signUp = async (req: Request, res: Response) => {
 
         if (!assertDotEnv()) {
@@ -100,6 +112,12 @@ class AuthController {
         return;
     }
 
+    /**
+    * Handles user login by validating input, checking credentials, and issuing tokens.
+    * 
+    * @param req - Express request object containing email and password in the body.
+    * @param res - Express response object used to send responses to the client.
+    */
     public login = async (req: Request, res: Response) => {
         // console.log("cookies", req.cookies);
         // console.log("signed cookies", req.signedCookies);
@@ -147,15 +165,19 @@ class AuthController {
             }
         });
     }
-   
+
+    /**
+    * Handles token refresh by validating the refresh token and issuing a new access token.
+    * 
+    * @param req - Express request object containing refresh token in cookies.
+    * @param res - Express response object used to send responses to the client.
+    */
     public refreshToken = async (req: Request, res: Response) => {
         if (!assertDotEnv()) {
             res.status(500).send({ message: 'Internal Server Error 065' });
             throw new Error('dot env failed to load');
         }
         const { refreshToken } = req.cookies;
-
-
         if (!refreshToken) {
             res.status(400).send({ message: 'Refresh token is required.' });
             return;
@@ -173,7 +195,7 @@ class AuthController {
                 res.status(401).send({ message: 'Invalid refresh token.' });
                 return;
             }
-            const { uid, iat, exp } = decoded;
+            const { uid } = decoded;
             const tokenValid = await isTokenValid(refreshToken);
             if (!tokenValid) {
                 console.log("Invalid token: ", refreshToken);
@@ -184,24 +206,30 @@ class AuthController {
             const accessToken = issueAcesstoken(uid);
             tokens.accessToken = accessToken;
             tokens.uid = uid;
-            const refreshRefreshToken = 15 * 60 * 1000; // 15 minutes
-            if (exp * 1000 - Date.now() < refreshRefreshToken) {
-                const newRefreshToken = await issueRefreshToken(uid);
-                if (!newRefreshToken.result) {
-                    console.log("Error on new refresh token", newRefreshToken);
-                    res.status(500).send({ message: 'Internal server error.' });
-                    return;
-                }
-                deleteToken(refreshToken);
-                tokens.refreshToken = newRefreshToken.token;
-            }
+            // const refreshRefreshToken = 15 * 60 * 1000; // 15 minutes
+            // if (exp * 1000 - Date.now() < refreshRefreshToken) {
+            //     const newRefreshToken = await issueRefreshToken(uid);
+            //     if (!newRefreshToken.result) {
+            //         console.log("Error on new refresh token", newRefreshToken);
+            //         res.status(500).send({ message: 'Internal server error.' });
+            //         return;
+            //     }
+            //     deleteToken(refreshToken);
+            //     tokens.refreshToken = newRefreshToken.token;
+            // }
             res.status(200).json(tokens);
         });
     }
 
+    /**
+   * Handles user logout by invalidating the refresh token and clearing the cookie.
+   * 
+   * @param req - Express request object containing refresh token in cookies.
+   * @param res - Express response object used to send responses to the client.
+   */
     public logout = async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
-        
+
         if (!refreshToken) {
             res.status(400).send({ message: 'Refresh token is required.' });
             return;
@@ -216,6 +244,13 @@ class AuthController {
         res.status(200).send({ message: 'Logout successful.' });
     }
 
+
+    /**
+    * Handles logout from all devices by invalidating all refresh tokens for the user and clearing the cookie.
+    * 
+    * @param req - Express request object containing refresh token in cookies.
+    * @param res - Express response object used to send responses to the client.
+    */
     public logoutFromAll = async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
@@ -231,14 +266,14 @@ class AuthController {
             if (err) {
                 res.status(401).send({ message: 'Invalid refresh token.' });
                 return;
-                
+
             }
             const { uid } = decoded;
             const del_res = await deleteTokenByUserId(uid);
-            
+
             res.clearCookie('refreshToken');
             res.status(200).send({ message: 'Logout successful.', terminated: del_res });
-    
+
         });
 
     }

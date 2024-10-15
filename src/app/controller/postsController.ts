@@ -17,6 +17,17 @@ interface deletedPost {
 // Keep track of the id of deleted posts
 const deletedPostsId: Array<deletedPost> = []
 
+// Clean up the deleted posts every 10 minutes
+const cleanDeletedPostIds = setTimeout(() => {
+    const now = new Date();
+    deletedPostsId.forEach((post, index) => {
+        if (now.getTime() - post.when.getTime() > 10 * 60 * 1000) {
+            deletedPostsId.splice(index, 1);
+        }
+    });
+    console.log('cleaning deleted posts:', deletedPostsId.length);
+}, 10 * 60 * 1000);
+
 /**
  * The PostController class handles various operations related to posts, including creating, editing, deleting, and retrieving posts.
  * 

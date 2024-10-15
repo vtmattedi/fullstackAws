@@ -1,9 +1,8 @@
+/*If you decide to go with 3 separate servers, this would be a router for the auth server*/
+
 import { Router } from "express";
 import {authController} from "../controller/authController";
-import authMiddleware from "../controller/authMiddleware";
 const authRouter: Router = Router()
-
-//Routes
 authRouter.get("/", (req, res) => {
     res.send("Hello World");
 });

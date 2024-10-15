@@ -5,7 +5,7 @@ import { createUser, getUsersByEmail } from "../Model/user";
 import * as Crypto from 'crypto';
 import { createToken, deleteToken, isTokenValid, deleteTokenByUserId } from '../Model/refreshtokens';
 import { Asserter, assertDotEnv } from '../Asserter';
-
+import { getUserById, deleteUser } from "../Model/user";
 
 // Issue a new access token to a user with 15 seconds expiration
 const issueAcesstoken = (uid: string) => {
@@ -275,6 +275,80 @@ class AuthController {
             res.status(200).send({ message: 'Logout successful.', terminated: del_res });
 
         });
+
+    }
+
+
+    /**
+    * Handles requests to delete a user by user ID.
+    * 
+    * @param req - The request object containing the user ID in the body.
+    * @param res - The response object used to send the response.
+    * @returns A response indicating the result of the delete operation.
+    */
+    deleteAccount = async (req: Request, res: Response) => {
+        //Get the token
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            res.status(400).send({ message: 'Refresh token is required.' });
+            return;
+        }
+        //Make sure it is a valid session
+        if (!await isTokenValid(refreshToken)) {
+            res.clearCookie('refreshToken');
+            res.status(401).send({ message: 'Invalid refresh token.' });
+            return;
+        }
+        //Get the user id from the token
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, async (err: any, decoded: any) => {
+            if (err) {
+                res.status(401).send({ message: 'Invalid refresh token.' });
+                return;
+
+            }
+            const { uid } = decoded;
+
+            const user = (await getUserById(uid));
+            if (!user.found) {
+                //This should never happen
+                //Means that a refresh token was issued for a user that does not exist
+                //Or a user was deleted while still having a valid refresh token
+                res.status(404).send({ message: 'User not found' });
+                return;
+            }
+            
+            // Prevent the test account from being deleted
+            if (user.user.email === 'test@test.com') {
+                res.status(403).send({ message: 'The test account cannot be deleted' });
+                return;
+            }
+
+
+            //Delete ALL refresh tokens issued to the user at least 1 token should exist
+            //since we verified that this is a valid session
+            const deleteTokenByUserIdResult = await deleteTokenByUserId(uid);
+            if (!deleteTokenByUserIdResult) {
+                //Clear the cookie
+                res.clearCookie('refreshToken');
+                res.status(500).send({ message: 'Internal Server Error' });
+                return;
+            }
+
+            //Delete the user
+            console.log('deleting user:', uid);
+            const result = await deleteUser(uid);
+            if (result) {
+                //Clear the cookie
+                res.clearCookie('refreshToken');
+                res.status(200).send({ message: 'User deleted' });
+            }
+            else {
+                res.status(500).send({ message: 'Internal Server Error' });
+            }
+
+        });
+
+
 
     }
 }

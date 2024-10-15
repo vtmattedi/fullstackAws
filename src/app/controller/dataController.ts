@@ -2,9 +2,6 @@
 
 import { Request, Response } from 'express';
 import { getUserById, getUsers, getUsersByEmail, User, modifyUser, searchUser, deleteUser } from '../Model/user';
-import { deleteTokenByUserId } from '../Model/refreshtokens';
-import * as Posts from '../Model/posts';
-import { url } from 'inspector';
 import { Asserter } from '../Asserter';
 
 class DataController {
@@ -139,38 +136,7 @@ class DataController {
     }
 
 
-    /**
-    * Handles requests to delete a user by user ID.
-    * 
-    * @param req - The request object containing the user ID in the body.
-    * @param res - The response object used to send the response.
-    * @returns A response indicating the result of the delete operation.
-    */
-    deleteUser = async (req: Request, res: Response) => {
-        const userId = req.body.uid;
-        const user = (await getUserById(userId));
-        if (!user.found) {
-            res.status(404).send({ message: 'User not found' });
-            return;
-        }
-        console.log('delete user:', userId);
-        const result = await deleteUser(userId);
-        const deleteTokenByUserIdResult = await deleteTokenByUserId(userId);
-        res.clearCookie('refreshToken');
-        if (!deleteTokenByUserIdResult) {
-            res.status(500).send({ message: 'Internal Server Error' });
-            return;
-        }
-
-
-        if (result) {
-            res.status(200).send({ message: 'User deleted' });
-        }
-        else {
-            res.status(500).send({ message: 'Internal Server Error' });
-        }
-
-    }
+    
 }
 
 export const dataController = new DataController();

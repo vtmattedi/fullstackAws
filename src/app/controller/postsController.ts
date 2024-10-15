@@ -17,15 +17,15 @@ interface deletedPost {
 // Keep track of the id of deleted posts
 const deletedPostsId: Array<deletedPost> = []
 
-// Clean up the deleted posts every 10 minutes
-const cleanDeletedPostIds = setTimeout(() => {
+// Clean up the deleted posts older than 10 minutes every 10 minutes
+const cleanDeletedPostIds = setInterval(() => {
     const now = new Date();
-    deletedPostsId.forEach((post, index) => {
+    for (const post of deletedPostsId) {
         if (now.getTime() - post.when.getTime() > 10 * 60 * 1000) {
-            deletedPostsId.splice(index, 1);
-        }
-    });
-    console.log('cleaning deleted posts:', deletedPostsId.length);
+            const index = deletedPostsId.indexOf(post);
+            deletedPostsId.splice(index, 1);           
+        }        
+    }
 }, 10 * 60 * 1000);
 
 /**

@@ -22,9 +22,9 @@ allRouter.get("/api/newposts",authMiddleware, postController.getNewPosts);
 allRouter.post("/api/newpost", authMiddleware, postController.handleCreatePost);
 allRouter.put("/api/editpost", authMiddleware, postController.handleEditPost);
 allRouter.delete("/api/deletepost", authMiddleware, postController.handleDeletePost);
-allRouter.use("/api/posts",authMiddleware, postController.getPostsByUserId);
-allRouter.use("/api/post/:id",authMiddleware, postController.getPostsByUserId);
-allRouter.use("/api/allposts",authMiddleware, postController.getAllPosts);
+allRouter.get("/api/posts",authMiddleware, postController.getPostsByUserId);
+allRouter.get("/api/post/:id",authMiddleware, postController.getPostsByUserId);
+allRouter.get("/api/allposts",authMiddleware, postController.getAllPosts);
 
 /*User Requests*/
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
@@ -34,8 +34,8 @@ allRouter.get("/api/finduser",authMiddleware, dataController.getUser);
 allRouter.get("/api/userinfo/:id",authMiddleware, dataController.handleUserInfoById)
 
 /* Health check*/
-allRouter.use("/api/healtz", (req, res) => {
-    res.status(200).send("OK");
+allRouter.get("/api/healthy", (req, res) => {
+    res.status(200).send("Server is live.");
 });
 
 

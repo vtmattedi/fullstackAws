@@ -8,12 +8,14 @@ This project is currently been host on render you can check out the project depl
 
 Check out the front-end Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
 
-<description>
-<summary>*note*</summary>
-The free tier on render makes the server spin down after beeing inactive so I made little python script that constantly pings the server so it is always readly available (if the server is not up it takes up to a few minutes to get it running again) however, to save a few minutes on render I shut the script down between 1 and 5 am (GMT -3), therefore it is expected for the web page to take a long time on first access during those hours. 
-</description>
+<details><summary >Note of website availability on render</summary>
 
-## Security
+ ---
+The free tier on render makes the server spin down after beeing inactive so I made little python script that constantly pings the server so it is always readly available (if the server is not up it takes up to a few minutes to get it running again) however, to save a few minutes on render I shut the script down between 1 and 5 am (GMT -3), therefore it is expected for the web page to take a long time on first access during those hours. 
+
+</details>
+
+## 🔏 Security
 The authentication method used on this project are based on two steps:
 
  * a JWT access token using the `Bearer` header, used on every request to the server.
@@ -35,7 +37,7 @@ The token contains only the user ID (uid) for whom it was issued.
 The fornt-end of the project was devolped in React and I do not need the whole project here, only the build folder. Ideally I would have it as a sub-module and during the deployment I would build the project
 and then serve the build folder. Unfortunately, render's free tier have limited pipeline usage. Therefore, at least for now i am manually building the front-end and copying it over to here.
 
-### Session on the front-end
+### ⏲️ Session on the front-end
  On the front-end project, there is two hooks:
  * useAxiosCred 
  * useAxiosJwt
@@ -55,20 +57,20 @@ Both of those files are expected to be on root folder of the project.
 
 With those files created run:
 
-```bash
+```JavaScript
 //Install the used modules
 npm install
 ```
 Then
-```bash
+```JavaScript
 npx tsx ./src/index.ts //Run the server.
 ```
 Or 
-```bash
+```JavaScript
  npx nodemon //Live test Server.
 ```
 you can also use:
-```bash
+```JavaScript
 npm run start:prod //Starts the app.
 npm run start:dev  //Starts the live server.
 ```
@@ -78,8 +80,12 @@ to run those commands
 The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution.
 
 ## :round_pushpin:Endpoints
-* <details>
-<summary>*Authentication Routes*</summary>
+
+- ***Authentication Routes***
+<details>
+<summary>
+ see all
+</summary>
 
 #### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/signup```
 - **Expects**: User signup details in the request body.
@@ -121,6 +127,7 @@ The original idea was to have mulitple servers: one only for authentication, one
     |**200**|```{access token: string}```|Token refresh successful|
     |**401**|```{message: string}```|Unauthorized|
     |**500**|```{message: string}```|Internal server error|
+
 </details>
 <details>
 <summary>Data Api Routes</summary>

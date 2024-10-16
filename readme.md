@@ -82,12 +82,47 @@ The original idea was to have mulitple servers: one only for authentication, one
     * expects: Body with email and password
     * Returns: 200 if successful or an error if failed to provide an input or no such credentials exists
 
-    |**Code**                                           |**Body**                                          |**Description**      |
-    |---------------------------------------------------|--------------------------------------------------|---------------------|
+    |**Code**                            |**Body**                                              |**Description**          |
+    |--------------------------------|--------------------------------------------------|---------------------|
     |<p style="Color: green; font-weight: bold">200</p> |<b>access token</b>: string<br/><b>uid</b>: number|Login succesful      |
-    |<p style="Color: red; font-weight: bold">401</p>   |<b>message</b>: string                            |Unauthorized         |
-    |<p style="Color: red; font-weight: bold">500</p>   |<b>message</b>: string                            |Internal server error|
-    |<p style="Color: red; font-weight: bold">400</p>   |<b>message</b>: string                            |Invalid input        |
+    |<p style="Color: red; font-weight: bold">401</p>   |<b>message</b>: string                              |Unauthorized         |
+    |<p style="Color: red; font-weight: bold">500</p>   |<b>message</b>: string                              |Internal server error|
+    |<p style="Color: red; font-weight: bold">400</p>   |<b>message</b>: string                              |Invalid input        |
+
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Body</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="color: green; font-weight: bold">200</td>
+                <td><b>access token</b>: string<br/><b>uid</b>: number</td>
+                <td>Login successful</td>
+            </tr>
+            <tr>
+                <td style="color: red; font-weight: bold">401</td>
+                <td><b>message</b>: string</td>
+                <td>Unauthorized</td>
+            </tr>
+            <tr>
+                <td style="color: red; font-weight: bold">500</td>
+                <td><b>message</b>: string</td>
+                <td>Internal server error</td>
+            </tr>
+            <tr>
+                <td style="color: red; font-weight: bold">400</td>
+                <td><b>message</b>: string</td>
+                <td>Invalid input</td>
+            </tr>
+        </tbody>
+    </table>
+
 
 - /auth/signup
     * expects: Body with email, username and password:

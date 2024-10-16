@@ -44,9 +44,10 @@ class AllInOneServer extends BasicServer {
     this.router(allRouter); /*Router for Apis + Auth*/
 
     /*Serves the React Page*/
-    this.server.use(express.static(path.resolve('./front')));
+    const frontendFolder = process.env.FRONTEND_FOLDER ?? './front';
+    this.server.use(express.static(path.resolve(frontendFolder)));
     this.server.use('*', (req,res) => {
-      res.sendFile(path.resolve('./front/index.html'))
+      res.sendFile(path.resolve(frontendFolder + '/index.html'))
       });
   }
 }

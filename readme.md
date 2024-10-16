@@ -1,38 +1,105 @@
-# Fullstack posts application
+# Fullstack posts application 
 
-Full stack example application written in typescript using AWS RDS with jwt authentication.
-Check the project deployed [Here](https://fullstackaws.onrender.com/).
+This is a project that showcases a fullstack application that integrates a MVC pattern, a AWS RDS database and a React front-end.
 
-Check the frontend Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
+The app, is a network example where you can check a global feed in real time, post content, edit content and see other users posts. It implements JWT authentication with session based refresh tokens and access tokens.
 
-### Security
+This project is currently been host on render you can check out the project deployed [Here](https://fullstackaws.onrender.com/).
 
-It implements JWT, access and refresh tokens using httpOnly and secure cookies.
+Check out the front-end Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
 
-### Running the app:
+## Security
 
-## Required Files
-* .env with:
-    * JWT_SECRET
-    * JWT_REFRESH_SECRET 
-    * SCRYPT_SALT 
-    * FRONTEND_PORT *(optional)*
-    * BACKEND_PORT  *(optional)*
-    * AUTH_PORT  *(optional)*
-    * DB_PWD 
-    * DB_USER 
-    * DB_HOST
+The authentication method used on this project are based on two steps:
+ * At login or after sign up, the user is issued a access token and a cookie is set with a refresh token (httponly, secure)
+ * The user must provide the acess token on every api call using the 'Bearer' header, but there is no need to send the refresh token cookie.
+ * The user can solicitate a new access token using the refresh token cookie.
+ * For logout/delete account the user must provide the cookie.
+ * Once the user logs out the refresh token is invalidated. If the user chooses to logout from everywhere, the application invalidates all refresh tokens issued to that account.
+ * Once the refresh token expires the user must log in again.
 
-* schema.sql with the db setup querries
+
+## Front-end
+
+The fornt-end of the project was devolped in React and I do not need the whole project here, only the build folder. Ideally I would have it as a sub-module and during the deployment I would build the project
+and then serve the build folder. Unfortunately, render's free tier have limited pipeline usage. Therefore, at least for now i am manually building the front-end and copying it over to here.
+
+### Session on the front-end
+ On the front-end project, there is two hooks:
+ * useAxiosCred 
+ * useAxiosJwt
+
+When the useAxiosJwt is used, in case of failure due to code 401: not authorized, it will automaticaly request a new token and retry the request.
+
+For more information about the front-end app check its own [repository]("https://www.github.com/vtmattedi/fullstackawsfront").
+
+## Running the app:
+
+### Required Files
+* **.env:** File with you enviroment secrets check the [example](/.example.env)
+* **schema.sql:** The sql commands to make sure the databates exists and contains the proper tables.
+
+Both of those files are expected to be on root folder of the project.
+
 
 With those files created run:
 
 ```javascript
+//Install the used modules
 npm install
-npx tsx ./src/index.ts
 ```
-or 
+Then
 ```javascript
-// Live test Server 
-npx nodemon
+npx tsx ./src/index.ts //Run the server.
 ```
+Or 
+```javascript
+ npx nodemon //Live test Server.
+```
+you can also use:
+```javascript
+npm run start:prod //Starts the app.
+npm run start:dev  //Starts the live server.
+```
+to run those commands 
+
+## Multiple servers
+The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution.
+
+## Apis
+
+<details> 
+<summary><b>Auth Apis:</b></summary>
+
+- /auth/login
+    * expects: Body with email and password
+    * Returns: 200 if successful or an error if failed to provide an input or no such credentials exists
+- /auth/signup
+    * expects: Body with email, username and password:
+    * returns: 201 if successful or an error if there is already an user with that email, or there are restrictions on the password/email or username chosen
+- /auth/logout
+    * expects: a refresh token cookie
+    * returns: 200 and clears the cookie if successful or a code error if the refresh token is not valid
+- /auth/logoutEveryone
+    * expects: A refresh token cookie.
+    * returns: 200 and clears all refresh tokens associated with the user id from the database, so all the session of that user will not be valid.
+
+- /auth/token
+    * expects: A refresh token cookie.
+    * returns: A access token and the user id of the refresh token
+
+- /auth/deleteaccount
+    * expects: A refresh token cookie.
+    * returns: 200 and deletes all session cookies that are associated with the user id of the requester. Also deletes the account from the database. 
+</details>
+
+<details>
+<summary>Data Apis:</summary>
+    - /api/dashboard
+
+</details>
+
+<details>
+<summary> Others: </summary>
+    for all other requests the response is either a static file or file the file is not found and the request does not match any of the other types it will serve the index.html file of the react build.
+</details>

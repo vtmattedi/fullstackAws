@@ -54,7 +54,7 @@ class AuthController {
             const users = await getUsersByEmail(email);
             // Check if email is already registered
             if (users.found) {
-                res.status(400).json({ message: 'email:Email already registered.' });
+                res.status(409).json({ message: 'email:Email already registered.' });
                 res.send();
                 return;
             }
@@ -286,7 +286,7 @@ class AuthController {
     * @param res - The response object used to send the response.
     * @returns A response indicating the result of the delete operation.
     */
-    deleteAccount = async (req: Request, res: Response) => {
+    public deleteAccount = async (req: Request, res: Response) => {
         //Get the token
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {

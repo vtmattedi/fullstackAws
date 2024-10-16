@@ -72,84 +72,147 @@ to run those commands
 ## Multiple servers
 The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution.
 
-## Endpoints
-
-<details> 
-<summary><b>Auth Apis:</b></summary>
-
-#### /auth/login
-- /auth/login 
-    * expects: Body with email and password
-    * Returns: 200 if successful or an error if failed to provide an input or no such credentials exists
-
-    |**Code**                            |**Body**                                              |**Description**          |
-    |--------------------------------|--------------------------------------------------|---------------------|
-    |<p style="Color: green; font-weight: bold">200</p> |<b>access token</b>: string<br/><b>uid</b>: number|Login succesful      |
-    |<p style="Color: red; font-weight: bold">401</p>   |<b>message</b>: string                              |Unauthorized         |
-    |<p style="Color: red; font-weight: bold">500</p>   |<b>message</b>: string                              |Internal server error|
-    |<p style="Color: red; font-weight: bold">400</p>   |<b>message</b>: string                              |Invalid input        |
-
-
-
-    <table>
-        <thead>
-            <tr>
-                <th>Code</th>
-                <th>Body</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="color: green; font-weight: bold">200</td>
-                <td><b>access token</b>: string<br/><b>uid</b>: number</td>
-                <td>Login successful</td>
-            </tr>
-            <tr>
-                <td style="color: red; font-weight: bold">401</td>
-                <td><b>message</b>: string</td>
-                <td>Unauthorized</td>
-            </tr>
-            <tr>
-                <td style="color: red; font-weight: bold">500</td>
-                <td><b>message</b>: string</td>
-                <td>Internal server error</td>
-            </tr>
-            <tr>
-                <td style="color: red; font-weight: bold">400</td>
-                <td><b>message</b>: string</td>
-                <td>Invalid input</td>
-            </tr>
-        </tbody>
-    </table>
-
-
-- /auth/signup
-    * expects: Body with email, username and password:
-    * returns: 201 if successful or an error if there is already an user with that email, or there are restrictions on the password/email or username chosen
-- /auth/logout
-    * expects: a refresh token cookie
-    * returns: 200 and clears the cookie if successful or a code error if the refresh token is not valid
-- /auth/logoutEveryone
-    * expects: A refresh token cookie.
-    * returns: 200 and clears all refresh tokens associated with the user id from the database, so all the session of that user will not be valid.
-
-- /auth/token
-    * expects: A refresh token cookie.
-    * returns: A access token and the user id of the refresh token
-
-- /auth/deleteaccount
-    * expects: A refresh token cookie.
-    * returns: 200 and deletes all session cookies that are associated with the user id of the requester. Also deletes the account from the database. 
-</details>
-
+## Api Routes
 <details>
-<summary><b>Data Apis:</b></summary>
-    - /api/dashboard
+<summary>Endpoints</summary>
+
+## Authentication Routes
+
+#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/signup```
+- **Expects**: User signup details in the request body.
+- **Returns**: Status indicating success or failure of the signup process.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**201**|```{message: string}```|Signup successful|
+    |**400**|```{message: string}```|Invalid input|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/login```
+- **Expects**: Body with email and password.
+- **Returns**: 200 if successful, or an error if input is invalid or credentials are incorrect.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{access token: string, uid: number}```|Login successful|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+    |**400**|```{message: string}```|Invalid input|
+
+#### ![Static Badge](https://img.shields.io/badge/DELETE-red?style=plastic) ```/auth/logout```
+- **Expects**: Valid access token in headers.
+- **Returns**: Status of the logout operation.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{message: string}```|Logout successful|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/token```
+- **Expects**: Body with refresh token.
+- **Returns**: A new access token.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{access token: string}```|Token refresh successful|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+## API Routes
+
+#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/newposts```
+- **Expects**: Valid access token in headers.
+- **Returns**: A list of new posts.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```[{post}, ...]```|List of new posts|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/api/newpost```
+- **Expects**: Post content in the body.
+- **Returns**: Status of post creation.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**201**|```{post: object}```|Post created|
+    |**400**|```{message: string}```|Invalid input|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/PUT-orange?style=plastic) ```/api/editpost```
+- **Expects**: Post content and post ID in the body.
+- **Returns**: Status of the edit operation.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{post: object}```|Post updated|
+    |**400**|```{message: string}```|Invalid input|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/DELETE-red?style=plastic) ```/api/deletepost```
+- **Expects**: Post ID in the body.
+- **Returns**: Status of the delete operation.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{message: string}```|Post deleted|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/posts```
+- **Expects**: Valid access token in headers.
+- **Returns**: Posts created by the authenticated user.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```[{post}, ...]```|List of user posts|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/allposts```
+- **Expects**: Valid access token in headers.
+- **Returns**: All posts available in the system.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```[{post}, ...]```|List of all posts|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+## User Routes
+
+#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/dashboard```
+- **Expects**: Valid access token in headers.
+- **Returns**: Dashboard data for the authenticated user.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{user: object}```|User data fetched|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/api/edituser```
+- **Expects**: User data in the body to update the profile.
+- **Returns**: Status of the update operation.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```{user: object}```|User updated|
+    |**400**|```{message: string}```|Invalid input|
+    |**401**|```{message: string}```|Unauthorized|
+    |**500**|```{message: string}```|Internal server error|
+
+## Health Check
+
+#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/healtz```
+- **Returns**: `200` status with "OK" for health check of the server.
+
+    |**Code** |**Body**|**Description**|
+    |:-------:|:--------:|:-------------:|
+    |**200**|```"OK"```|Health check successful|
 
 </details>
 
-<details>
-<summary><b>Data Apis:</b></summary>
-    for all other requests the response is either a static file or file the file is not found and the request does not match any of the other types it will serve the index.html file of the react build.
-</details>

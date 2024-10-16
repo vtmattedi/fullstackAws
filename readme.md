@@ -9,9 +9,15 @@ This project is currently been host on render you can check out the project depl
 Check out the front-end Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
 
 ## Security
-
 The authentication method used on this project are based on two steps:
- * At login or after sign up, the user is issued a access token and a cookie is set with a refresh token (httponly, secure)
+
+ * a JWT access token using the `Bearer` header, used on every request to the server.
+ * a JWT refresh token, used to log in, log out, delete account and get a new refresh token.
+
+The token contains only the user ID (uid) for whom it was issued.
+
+### Authorization Logic 
+ * At login or after sign up, the user is issued a access token and a cookie is set with a refresh token (httponly, secure).
  * The user must provide the acess token on every api call using the 'Bearer' header, but there is no need to send the refresh token cookie.
  * The user can solicitate a new access token using the refresh token cookie.
  * For logout/delete account the user must provide the cookie.
@@ -66,14 +72,23 @@ to run those commands
 ## Multiple servers
 The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution.
 
-## Apis
+## Endpoints
 
 <details> 
 <summary><b>Auth Apis:</b></summary>
 
-- /auth/login
+#### /auth/login
+- /auth/login 
     * expects: Body with email and password
     * Returns: 200 if successful or an error if failed to provide an input or no such credentials exists
+
+    |**Code**                                           |**Body**                                          |**Description**      |
+    |---------------------------------------------------|--------------------------------------------------|---------------------|
+    |<p style="Color: green; font-weight: bold">200</p> |<b>access token</b>: string<br/><b>uid</b>: number|Login succesful      |
+    |<p style="Color: red; font-weight: bold">401</p>   |<b>message</b>: string                            |Unauthorized         |
+    |<p style="Color: red; font-weight: bold">500</p>   |<b>message</b>: string                            |Internal server error|
+    |<p style="Color: red; font-weight: bold">400</p>   |<b>message</b>: string                            |Invalid input        |
+
 - /auth/signup
     * expects: Body with email, username and password:
     * returns: 201 if successful or an error if there is already an user with that email, or there are restrictions on the password/email or username chosen
@@ -94,12 +109,12 @@ The original idea was to have mulitple servers: one only for authentication, one
 </details>
 
 <details>
-<summary>Data Apis:</summary>
+<summary><b>Data Apis:</b></summary>
     - /api/dashboard
 
 </details>
 
 <details>
-<summary> Others: </summary>
+<summary><b>Data Apis:</b></summary>
     for all other requests the response is either a static file or file the file is not found and the request does not match any of the other types it will serve the index.html file of the react build.
 </details>

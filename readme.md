@@ -1,4 +1,4 @@
-# Fullstack posts application 
+<h1 align="center" style="font-weight: Bold">:desktop_computer: Fullstack posts application </h1>
 
 This is a project that showcases a fullstack application that integrates a MVC pattern, a AWS RDS database and a React front-end.
 
@@ -7,6 +7,11 @@ The app, is a network example where you can check a global feed in real time, po
 This project is currently been host on render you can check out the project deployed [Here](https://fullstackaws.onrender.com/).
 
 Check out the front-end Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
+
+<description>
+<summary>*note*</summary>
+The free tier on render makes the server spin down after beeing inactive so I made little python script that constantly pings the server so it is always readly available (if the server is not up it takes up to a few minutes to get it running again) however, to save a few minutes on render I shut the script down between 1 and 5 am (GMT -3), therefore it is expected for the web page to take a long time on first access during those hours. 
+</description>
 
 ## Security
 The authentication method used on this project are based on two steps:
@@ -50,20 +55,20 @@ Both of those files are expected to be on root folder of the project.
 
 With those files created run:
 
-```javascript
+```bash
 //Install the used modules
 npm install
 ```
 Then
-```javascript
+```bash
 npx tsx ./src/index.ts //Run the server.
 ```
 Or 
-```javascript
+```bash
  npx nodemon //Live test Server.
 ```
 you can also use:
-```javascript
+```bash
 npm run start:prod //Starts the app.
 npm run start:dev  //Starts the live server.
 ```
@@ -72,11 +77,9 @@ to run those commands
 ## Multiple servers
 The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution.
 
-## Api Routes
-<details>
-<summary>Endpoints</summary>
-
-## Authentication Routes
+## :round_pushpin:Endpoints
+* <details>
+<summary>*Authentication Routes*</summary>
 
 #### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/signup```
 - **Expects**: User signup details in the request body.
@@ -118,8 +121,9 @@ The original idea was to have mulitple servers: one only for authentication, one
     |**200**|```{access token: string}```|Token refresh successful|
     |**401**|```{message: string}```|Unauthorized|
     |**500**|```{message: string}```|Internal server error|
-
-## API Routes
+</details>
+<details>
+<summary>Data Api Routes</summary>
 
 #### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/newposts```
 - **Expects**: Valid access token in headers.

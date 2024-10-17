@@ -25,7 +25,7 @@ The authentication method used on this project are based on two steps:
 
 The token contains only the user ID (uid) for whom it was issued.
 
-### Authorization Logic
+### 🔓Authorization Logic:
 
 * At login or after sign up, the user is issued a access token and a cookie is set with a refresh token (httponly, secure).
 * The user must provide the acess token on every api call using the 'Bearer' header, but there is no need to send the refresh token cookie.
@@ -34,7 +34,7 @@ The token contains only the user ID (uid) for whom it was issued.
 * Once the user logs out the refresh token is invalidated. If the user chooses to logout from everywhere, the application invalidates all refresh tokens issued to that account.
 * Once the refresh token expires the user must log in again.
 
-## Front-end
+## 🖌️Front-end
 
 The fornt-end of the project was devolped in React and I do not need the whole project here, only the build folder. Ideally I would have it as a sub-module and during the deployment I would build the project
 and then serve the build folder. Unfortunately, render's free tier have limited pipeline usage. Therefore, at least for now i am manually building the front-end and copying it over to here.
@@ -50,9 +50,9 @@ When the useAxiosJwt is used, in case of failure due to code 401: not authorized
 
 For more information about the front-end app check its own [repository]().
 
-## Running the app:
+## 🖱️Running the app:
 
-### Required Files
+### 🗃️ Required Files
 
 * **.env:** File with you enviroment secrets check the [example](/.example.env)
 * **schema.sql:** The sql commands to make sure the databates exists and contains the proper tables.
@@ -87,43 +87,73 @@ npm run start:dev  //Starts the live server.
 
 to run those commands
 
-## Multiple servers
+## 💠Multiple servers
 
-The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution.
+The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution, I have opted for a single server solution.
 
 ## 📍Endpoints
 
-Here's the updated README with each table hidden inside a `<details>` tag and a summary for viewing the return table:
+> ### Authentication Routes
 
----
+<br>
+<div style="display: flex; align-items: center;">
+<img src = "https://img.shields.io/badge/POST-blue?style=plastic"
+style="margin: 5px" alt= "static badge">
+<code>/auth/signup</code>
+</div>
+<br>
+<details>
+<summary><b>Table</b></summary>
+<hr>
+<table>
+    <thead>
+        <tr style="align-text: center;">
+            <th>Code</th>
+            <th>Body</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="color: green; font-weight: bold"> 201</td>
+            <td><code>{accessToken: string, uid: int}</code></td>
+            <td>Signup successful, set refreshToken cookie.</td>
+        </tr>
+        <tr>
+            <td style="color: red; font-weight: bold"> 400</td>
+            <td><code>{message: string}</code></td>
+            <td>Invalid input.</td>
+        </tr>
+        <tr>
+           <td style="color: red; font-weight: bold"> 500</td>
+            <td><code>{message: string}</code></td>
+            <td>Internal server error.</td>
+        </tr>
+    </tbody>
+</table>
+</details>
 
-# Server API Documentation
-
-This README explains the API endpoints available in the project, organized by method and the purpose of each route.
-
-## Authentication Routes
-
-#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/signup```
 - **Expects**: User signup details in the request body.
 - **Returns**: Status indicating success or failure of the signup process.
 
-<details>
-  <summary>Check the return table</summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**201**|```{message: string}```|Signup successful|
-  |**400**|```{message: string}```|Invalid input|
-  |**500**|```{message: string}```|Internal server error|
+><details>
+> <summary><i>Check the return table</i></summary>
+>
+>  |**Code** |**Body**|**Description**|
+>  |:-------:|:--------:|:-------------:|
+>  |**201**|```{accessToken: string, uid: int}```|Signup successful, set refreshToken cookie.|
+>  |**400**|```{message: string}```|Invalid input.|
+>  |**500**|```{message: string}```|Internal server error.|
 
 </details>
+<hr>
 
 #### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/login```
 - **Expects**: Body with email and password.
 - **Returns**: 200 if successful, or an error if input is invalid or credentials are incorrect.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -139,7 +169,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: Status of the logout operation.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -154,7 +184,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: A new access token.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -164,18 +194,23 @@ This README explains the API endpoints available in the project, organized by me
 
 </details>
 
-## API Routes
+
+
+### API Routes
+
+<details>
+  <summary>See Posts Routes</summary>
 
 #### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/newposts```
 - **Expects**: Valid access token in headers.
-- **Returns**: A list of new posts.
+- **Returns**: An array of new posts and an array of deleted post ids.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
-  |**200**|```[{post}, ...]```|List of new posts|
+  |**200**|```{posts: Array<Posts>, deleted: Array<number>}```|List of new posts after the requested id and the deleted posts in the last 10 minutes|
   |**401**|```{message: string}```|Unauthorized|
   |**500**|```{message: string}```|Internal server error|
 
@@ -186,7 +221,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: Status of post creation.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -201,7 +236,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: Status of the edit operation.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -216,20 +251,23 @@ This README explains the API endpoints available in the project, organized by me
 - **Expects**: Post ID in the body.
 - **Returns**: Status of the delete operation.
 
-[details="Check Table"]
+<details>
+  <summary><i>Check the return table</i></summary>
+  
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
   |**200**|```{message: string}```|Post deleted|
   |**401**|```{message: string}```|Unauthorized|
   |**500**|```{message: string}```|Internal server error|
-[/details]
+
+</details>
 
 #### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/posts```
 - **Expects**: Valid access token in headers.
 - **Returns**: Posts created by the authenticated user.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -244,7 +282,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: All posts available in the system.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -252,6 +290,7 @@ This README explains the API endpoints available in the project, organized by me
   |**401**|```{message: string}```|Unauthorized|
   |**500**|```{message: string}```|Internal server error|
 
+</details>
 </details>
 
 ## User Routes
@@ -261,7 +300,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: Dashboard data for the authenticated user.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -276,7 +315,7 @@ This README explains the API endpoints available in the project, organized by me
 - **Returns**: Status of the update operation.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
@@ -287,18 +326,22 @@ This README explains the API endpoints available in the project, organized by me
 
 </details>
 
-## Health Check
+#### Other Routes
+
+<details>
+  <summary><b>See Others</b></summary>
 
 #### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/healtz```
 - **Returns**: `200` status with "OK" for health check of the server.
 
 <details>
-  <summary>Check the return table</summary>
+  <summary><i>Check the return table</i></summary>
 
   |**Code** |**Body**|**Description**|
   |:-------:|:--------:|:-------------:|
   |**200**|```"OK"```|Health check successful|
 
+</details>
 </details>
 
 ---

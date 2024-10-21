@@ -2,13 +2,33 @@
 
 This is a project that showcases a fullstack application that integrates a MVC pattern, a AWS RDS database and a React front-end.
 
+
+<div style="display:flex; flex-direction: row; align-content: center; gap: 5px; align-items: center;">
+<img src="https://img.shields.io/website.svg?down_color=red&down_message=down&up_color=green&up_message=up&url=http%3A%2F%2Fcv.lbesson.qc.to" align=center></img>
+<p align=center>
+This project is currently been host on render you can check out the project deployed
+<a href="https://fullstackaws.onrender.com/">Here</a>.</p>
+</div>
+
 The app, is a network example where you can check a global feed in real time, post content, edit content and see other users posts. It implements JWT authentication with session based refresh tokens and access tokens.
 
-This project is currently been host on render you can check out the project deployed [Here](https://fullstackaws.onrender.com/).
+Some of the feature you will find on this project:
 
-Check out the front-end Project [Here](https://github.com/vtmattedi/fullstackAwsfront).
+- Create/Edit/Delete posts.
+- Create and delete Account.
+- Edit your username.
+- Check other Users and thier posts.
+- See a global feed of all posts in real time.
+- Secure session with JWT tokens.
+- Logout from everywhere feature.
+- AWS integration, using AuroraMySQL RDS service.
+- Fully responsive website. (Check it out on your phone and on desktop).
+- Light/Dark Theme that persists per user per device.
 
-<details><summary >Note of website availability on render</summary>
+
+Check out the front-end project [Here](https://github.com/vtmattedi/fullstackAwsfront).
+
+<details><summary ><i>Note of website availability on render.</i></summary>
 
 ---
 
@@ -21,14 +41,15 @@ The free tier on render makes the server spin down after beeing inactive so I ma
 The authentication method used on this project are based on two steps:
 
 * a JWT access token using the `Bearer` header, used on every request to the server.
-* a JWT refresh token, used to log in, log out, delete account and get a new refresh token.
+* a JWT refresh token, used to log in, log out, delete account and get a new access token.
 
 The token contains only the user ID (uid) for whom it was issued.
 
 ### 🔓Authorization Logic:
 
-* At login or after sign up, the user is issued a access token and a cookie is set with a refresh token (httponly, secure).
-* The user must provide the acess token on every api call using the 'Bearer' header, but there is no need to send the refresh token cookie.
+* At login or after sign up, the user is issued an access token and a cookie is set with a refresh token (httponly, secure).
+* The user must provide the access token on every api call using the 'Bearer' header, but there is no need to send the refresh token cookie.
+* The access token is set to be only 15 seconds. 
 * The user can solicitate a new access token using the refresh token cookie.
 * For logout/delete account the user must provide the cookie.
 * Once the user logs out the refresh token is invalidated. If the user chooses to logout from everywhere, the application invalidates all refresh tokens issued to that account.
@@ -36,7 +57,7 @@ The token contains only the user ID (uid) for whom it was issued.
 
 ## 🖌️Front-end
 
-The fornt-end of the project was devolped in React and I do not need the whole project here, only the build folder. Ideally I would have it as a sub-module and during the deployment I would build the project
+The front-end of the project was devolped in React and I do not need the whole project here, only the build folder. Ideally I would have it as a sub-module and during the deployment I would build the project
 and then serve the build folder. Unfortunately, render's free tier have limited pipeline usage. Therefore, at least for now i am manually building the front-end and copying it over to here.
 
 ### ⏲️ Session on the front-end
@@ -48,13 +69,13 @@ and then serve the build folder. Unfortunately, render's free tier have limited 
 
 When the useAxiosJwt is used, in case of failure due to code 401: not authorized, it will automaticaly request a new token and retry the request.
 
-For more information about the front-end app check its own [repository]().
+For more information about the front-end app check its own [repository]("https://github.com/vtmattedi/fullstackawsfront").
 
 ## 🖱️Running the app:
 
 ### 🗃️ Required Files
 
-* **.env:** File with you enviroment secrets check the [example](/.example.env)
+* **.env:** File with you enviroment secrets check the [example](/.example.env).
 * **schema.sql:** The sql commands to make sure the databates exists and contains the proper tables.
 
 Both of those files are expected to be on root folder of the project.
@@ -62,7 +83,7 @@ Both of those files are expected to be on root folder of the project.
 With those files created run:
 
 ```JavaScript
-//Install the used modules
+//Install the required modules
 npm install
 ```
 
@@ -78,270 +99,859 @@ Or
  npx nodemon //Live test Server.
 ```
 
-you can also use:
+You can also use:
 
 ```JavaScript
 npm run start:prod //Starts the app.
 npm run start:dev  //Starts the live server.
 ```
 
-to run those commands
-
 ## 💠Multiple servers
 
-The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately, the usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution, I have opted for a single server solution.
+The original idea was to have mulitple servers: one only for authentication, one to interact with most of the database and one to serve the front-end. That would open the possibility of scaling the servers separately. The usage of JWT makes this possible if we have the same `JWT_SECRET`. However, due to constrains on the free host solution, I have opted for a single server solution.
 
 ## 📍Endpoints
 
-> ### Authentication Routes
+<details open>
+<summary><b>Authentication</b></summary>
 
-<br>
-<div style="display: flex; align-items: center;">
-<img src = "https://img.shields.io/badge/POST-blue?style=plastic"
-style="margin: 5px" alt= "static badge">
+---
+
+<details open>
+<summary>
+<picture><img  src="https://img.shields.io/badge/POST-blue?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
 <code>/auth/signup</code>
-</div>
+</summary>
+
+- **Expects**: User signup details in the request body (email, username, password).
+- **Returns**: Status indicating success or failure of the signup process. If successful, the proper tokens and user id.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{201}}$</td>
+>             <td><code>{accessToken: string, uid: int}</code></td>
+>             <td>Signup successful, set refreshToken cookie.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{400}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Invalid input. the <code>message</code> will contain information about what is wrong with the input.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{409}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Email already registred to an account.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img  src="https://img.shields.io/badge/POST-blue?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/auth/login</code>
+</summary>
+
+- **Expects**: User login details in the request body (email, password).
+- **Returns**: Status indicating success or failure of the login process. If successful, the proper tokens and user id.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{accessToken: string, uid: int}</code></td>
+>             <td>Login successful, set refreshToken cookie.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{401}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Unauthorized, invalid credentials.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img  src="https://img.shields.io/badge/DELETE-red?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/auth/logout</code>
+</summary>
+
+- **Expects**: Cookie with the refresh token.
+- **Returns**: Status indicating success or failure of the logout process.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>              <td><code>{message: string}</code></td>
+>             <td>Logout successful, refreshToken cookie clear.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{401}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Invalid refreshToken cookie.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img  src="https://img.shields.io/badge/DELETE-red?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/auth/logoutEverywhere</code>
+</summary>
+
+- **Expects**: Cookie with the refresh token.
+- **Returns**: Status indicating success or failure of the logout process for all sessions.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>               <td><code>{message: string, terminated: int}</code></td>
+>             <td>Logout successful from all sessions, all refresh tokens with the token's uid deleted from the valid database.<code>terminated</code> indicates how many tokens were invalidated.</td>. refreshToken cookie cleared.
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{401}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Invalid refresh token.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img  src="https://img.shields.io/badge/POST-blue?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/auth/tokens</code>
+</summary>
+
+- **Expects**: Cookie with the refresh token.
+- **Returns**: New access token if refresh is successful.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{accessToken: string, uid: int}</code></td>
+>             <td>New access token issued.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{401}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Unauthorized, invalid refresh token.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img  src="https://img.shields.io/badge/DELETE-red?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/auth/deleteAccount</code>
+</summary>
+
+- **Expects**: Cookie with the refresh token.
+- **Returns**: Status indicating success or failure of the account deletion process.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Account deletion successful.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{401}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Unauthorized, invalid credentials.</td>
+>         </tr>
+>    <tr>
+>             <td>${\color{red}\textbf{403}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Forbidden, trying to delete an account that is not the same as the refresh token or protected accounts.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details></details>
+<br>
+<details >
+<summary><b>Data API</b></summary>
+<br>
+<p>All Routes on this list (<code>/api/*</code>) are authenticated via a <a href="./src/app/Controllers/authMiddleware.ts">middleware</a> and require an access token. Failure to provide a valid token in the request header, will result in the following response:
+</p>
+
+<table>
+<thead>
+</thead>
+<tbody>
+<tr>
+   <tr style="align-text: center;">
+        <th>Code</th>
+        <th>Body</th>
+        <th>Description</th>
+    </tr>
+<td>${\color{green}\textbf{401}}$</td>
+<td><code>{error: string}</code></td>
+<td>Not Authenticated</td>
+</tr>
+</tbody>
+</table>
+
+<hr><details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/allposts</code>
+</summary>
+
+- **Expects**: Size of the posts array in the URL parameters (optional, default = 100).
+- **Returns**: Array of the posts from all users.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{posts: Array< Posts > }</code></td>
+>             <td>Array of posts objects.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{green}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal Server Error</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/posts/:id</code>
+</summary>
+
+- **Expects**: 
+    * User ID in the URL path (optional, if missing will default to user's id. Anything other than positive numbers are treated as missing).
+    * Size in the URL parameters (optional, if missing will default to 100.
+    Anything other than positive numbers are treated as missing).
+- **Returns**: Posts from the target id with a maximum of the requested size.
+
+- **Example**:
+    * <code>/api/posts?size=100</code> -> Gets the last 100 posts of the uid present in the accessToken.
+    * <code>/api/posts/10?size=30</code> -> Gets the last 30 posts of user with uid = 10.
+     * <code>/api/posts/10?size=j</code> -> Gets the last 100 posts of user with uid = 10.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{posts: Array< Posts >}</code></td>
+>             <td>Array of posts from target id.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+
+
+
+
+
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/newposts</code>
+</summary>
+
+- **Expects**: 
+    * A <code>lastId</code> in the URL parameters.
+    * A <code>targetId</code> in the URL parameters. (optional, if not present will be defaulted to all users)  
+- **Returns**: An array of posts created after the last id provided (from the target id if provided) and an array of the deleted post IDs in the last 10 minutes.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{posts: Array< Posts >, deleted Array< int >}</code></td>
+>             <td>New posts since lastId and deleted posts' IDs.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/POST-blue?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/newpost</code>
+</summary>
+
+- **Expects**: New post details in the request body (title, content).
+- **Returns**: Status indicating success or failure of the post creation process.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{201}}$</td>
+>             <td><code>{message:string, postId: int}</code></td>
+>             <td>New post created successfully.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{400}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Invalid input.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/PUT-orange?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/editpost</code>
+</summary>
+
+- **Expects**: Updated post details in the request body ( postid, title, content).
+- **Returns**: Status code indicating success or failure of the post deletion process and a status message.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Post updated successfully.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{400}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Invalid input. Either title or content are empty.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{403}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Unauthorized, token's ID does not match post owners.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{404}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Post not found (post id not present in the database).</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/DELETE-red?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/deletepost</code>
+</summary>
+
+- **Expects**: Post ID in the URL parameters.
+- **Returns**: Status code indicating success or failure of the post deletion process and a status message.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>              <td><code>{message: string}</code></td>
+>             <td>Post deleted successfully.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{403}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Unauthorized, token's ID does not match post's owner.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{404}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Post not found. (Post ID does not exist in the database).</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{message: string}</code></td>
+>             <td>Internal server error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/dashboard</code>
+</summary>
+
+- **Expects**: `uid` in the request body.
+- **Returns**: The user's own information, including username, email, ID, and creation date.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{ user: string, email: string, id: int, created_at: string }</code></td>
+>             <td>User information retrieved successfully.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{404}}$</td>
+>             <td><code>{ message: 'User not found' }</code></td>
+>             <td>User ID not found in the system.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{ message: 'Internal Server Error' }</code></td>
+>             <td>Server encountered an error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/POST-blue?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/edituser</code>
+</summary>
+
+- **Expects**: `uid` in the request body, along with updated `username` or `email`.
+- **Returns**: Status indicating whether the user details were successfully updated.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{ message: string }</code></td>
+>             <td>User details successfully updated.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{400}}$</td>
+>             <td><code>{ message: string }</code></td>
+>             <td>Missing or invalid fields in request body.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{ message: string }</code></td>
+>             <td>Server encountered an error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/finduser</code>
+</summary>
+
+- **Expects**:  `searchTerm` as a URL parameter.
+- **Returns**: An array of users that match the `searchTerm`.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{ user: Array< User > }</code></td>
+>             <td> Array of users matching <code>searchTerm</code>. If <code>searchTerm</code> has length < 2 or is empty it will always return an empty array.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/userinfo/:id</code>
+</summary>
+
+- **Expects**: `userid` as a URL path. 
+- **Returns**: Information about a specific user if found.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>{ user: User }</code></td>
+>             <td>User information retrieved successfully.</td>
+>         </tr>
+>         <tr>
+>             <td>${\color{red}\textbf{404}}$</td>
+>             <td><code>{ message: string }</code></td>
+>             <td>User ID not found in the system.</td>
+>         </tr>
+>         <tr>
+>            <td>${\color{red}\textbf{500}}$</td>
+>             <td><code>{ message: string }</code></td>
+>             <td>Server encountered an error.</td>
+>         </tr>
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+</details>
+
 <br>
 <details>
-<summary><b>Table</b></summary>
+<summary><b>Others</b></summary>
 <hr>
-<table>
-    <thead>
-        <tr style="align-text: center;">
-            <th>Code</th>
-            <th>Body</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="color: green; font-weight: bold"> 201</td>
-            <td><code>{accessToken: string, uid: int}</code></td>
-            <td>Signup successful, set refreshToken cookie.</td>
-        </tr>
-        <tr>
-            <td style="color: red; font-weight: bold"> 400</td>
-            <td><code>{message: string}</code></td>
-            <td>Invalid input.</td>
-        </tr>
-        <tr>
-           <td style="color: red; font-weight: bold"> 500</td>
-            <td><code>{message: string}</code></td>
-            <td>Internal server error.</td>
-        </tr>
-    </tbody>
-</table>
-</details>
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/api/healthy</code>
+</summary>
 
-- **Expects**: User signup details in the request body.
-- **Returns**: Status indicating success or failure of the signup process.
+- **Info**: Health check route.
+- **Expects**: Nothing. 
+- **Returns**: OK if server if live.
 
-><details>
-> <summary><i>Check the return table</i></summary>
->
->  |**Code** |**Body**|**Description**|
->  |:-------:|:--------:|:-------------:|
->  |**201**|```{accessToken: string, uid: int}```|Signup successful, set refreshToken cookie.|
->  |**400**|```{message: string}```|Invalid input.|
->  |**500**|```{message: string}```|Internal server error.|
-
-</details>
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code> "Server is live."</code></td>
+>             <td>Should always respond with code 200.</td>
+>         </tr>        
+>     </tbody>
+> </table>
+> </details>
 <hr>
-
-#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/login```
-- **Expects**: Body with email and password.
-- **Returns**: 200 if successful, or an error if input is invalid or credentials are incorrect.
+</details>
 
 <details>
-  <summary><i>Check the return table</i></summary>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/</code>
+</summary>
 
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{access token: string, uid: number}```|Login successful|
-  |**400**|```{message: string}```|Invalid input|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
+- **Expects**: Nothing. 
+- **Returns**: The HTML for the index page.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code>HTML file</code></td>
+>             <td>Serves the front-end app.</td>
+>         </tr>        
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/GET-green?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+<code>/%filename%</code>
+</summary>
+
+- **Info**: static files for the front-end app.
+- **Expects**: Nothing. 
+- **Returns**: The file if it exists.
+
+> <details>
+> <summary><b><i>Check the response table</b></i></summary>
+> <hr>
+> <table>
+>     <thead>
+>         <tr style="align-text: center;">
+>             <th>Code</th>
+>             <th>Body</th>
+>             <th>Description</th>
+>         </tr>
+>     </thead>
+>     <tbody>
+>         <tr>
+>             <td>${\color{green}\textbf{200}}$</td>
+>             <td><code> The file if it exists in the proper folder.</code></td>
+>             <td>Should always respond with code 200.</td>
+>         </tr>        
+>     </tbody>
+> </table>
+> </details>
+<hr>
+</details>
+
+<details>
+<summary>
+<picture><img src="https://img.shields.io/badge/ALL-magenta?style=plastic" style="margin: 5px" alt="static badge" align=center></picture>
+Others
+</summary>
+
+- **Info**: If the path/method does not match with one of the above nor with a static file's name it will simply server the `ìndex.html` file.
 
 </details>
 
-#### ![Static Badge](https://img.shields.io/badge/DELETE-red?style=plastic) ```/auth/logout```
-- **Expects**: Valid access token in headers.
-- **Returns**: Status of the logout operation.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{message: string}```|Logout successful|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/auth/token```
-- **Expects**: Body with refresh token.
-- **Returns**: A new access token.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{access token: string}```|Token refresh successful|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
 
 </details>
 
 
 
-### API Routes
+## Used Tecnologies:
 
-<details>
-  <summary>See Posts Routes</summary>
-
-#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/newposts```
-- **Expects**: Valid access token in headers.
-- **Returns**: An array of new posts and an array of deleted post ids.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{posts: Array<Posts>, deleted: Array<number>}```|List of new posts after the requested id and the deleted posts in the last 10 minutes|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/api/newpost```
-- **Expects**: Post content in the body.
-- **Returns**: Status of post creation.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**201**|```{post: object}```|Post created|
-  |**400**|```{message: string}```|Invalid input|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/PUT-orange?style=plastic) ```/api/editpost```
-- **Expects**: Post content and post ID in the body.
-- **Returns**: Status of the edit operation.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{post: object}```|Post updated|
-  |**400**|```{message: string}```|Invalid input|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/DELETE-red?style=plastic) ```/api/deletepost```
-- **Expects**: Post ID in the body.
-- **Returns**: Status of the delete operation.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-  
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{message: string}```|Post deleted|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/posts```
-- **Expects**: Valid access token in headers.
-- **Returns**: Posts created by the authenticated user.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```[{post}, ...]```|List of user posts|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/allposts```
-- **Expects**: Valid access token in headers.
-- **Returns**: All posts available in the system.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```[{post}, ...]```|List of all posts|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-</details>
-
-## User Routes
-
-#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/dashboard```
-- **Expects**: Valid access token in headers.
-- **Returns**: Dashboard data for the authenticated user.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{user: object}```|User data fetched|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### ![Static Badge](https://img.shields.io/badge/POST-blue?style=plastic) ```/api/edituser```
-- **Expects**: User data in the body to update the profile.
-- **Returns**: Status of the update operation.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```{user: object}```|User updated|
-  |**400**|```{message: string}```|Invalid input|
-  |**401**|```{message: string}```|Unauthorized|
-  |**500**|```{message: string}```|Internal server error|
-
-</details>
-
-#### Other Routes
-
-<details>
-  <summary><b>See Others</b></summary>
-
-#### ![Static Badge](https://img.shields.io/badge/GET-green?style=plastic) ```/api/healtz```
-- **Returns**: `200` status with "OK" for health check of the server.
-
-<details>
-  <summary><i>Check the return table</i></summary>
-
-  |**Code** |**Body**|**Description**|
-  |:-------:|:--------:|:-------------:|
-  |**200**|```"OK"```|Health check successful|
-
-</details>
-</details>
-
+![React](https://img.shields.io/badge/React-3B5966?style=for-the-badge&logo=react&logoColor=61DAFB)
+![bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+![node](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
+![mysql](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+![aws](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![JWT](https://img.shields.io/badge/json%20web%20tokens-323330?style=for-the-badge&logo=json-web-tokens&logoColor=pink)
 ---

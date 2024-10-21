@@ -42,20 +42,22 @@ class AuthController {
         }
 
         //console.log(process.env);
-        const { username, password, email } = req.body;
+        const { username, password, _email } = req.body;
 
-        if (!username || !password || !email) {
+        if (!username || !password || !_email) {
             res.status(400).json({ message: 'Username and password and email are required' });
             res.send();
             return;
         }
+
+        const email = (_email as string).toLowerCase();
+
 
         try {
             const users = await getUsersByEmail(email);
             // Check if email is already registered
             if (users.found) {
                 res.status(409).json({ message: 'email:Email already registered.' });
-                res.send();
                 return;
             }
 
@@ -76,7 +78,6 @@ class AuthController {
                     message += ";user:" + usernameCheck.message;
                 }
                 res.status(400).json({ message: message });
-                res.send();
                 return;
             }
 
@@ -85,7 +86,6 @@ class AuthController {
                 if (err) {
                     console.log(err);
                     res.status(500).json({ message: 'Internal server error' });
-                    res.send();
                     return;
                 };
                 const hashpwd = derivedKey.toString('base64');
@@ -93,13 +93,11 @@ class AuthController {
                 const refTokenresult = await issueRefreshToken(userId);
                 if (!refTokenresult.result) {
                     res.status(500).json({ message: 'Internal server error' });
-                    res.send();
                     return;
                 }
                 // Respond with the token
                 res.cookie('refreshToken', refTokenresult.token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 72 * 60 * 60 * 1000 });
-                res.status(201).json({ accessToken: issueAcesstoken(userId) });
-                res.send();
+                res.status(201).json({ accessToken: issueAcesstoken(userId), uid: userId });
             });
 
 
@@ -157,8 +155,7 @@ class AuthController {
                     return;
                 }
                 res.cookie('refreshToken', refreshTokenResult.token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 72 * 60 * 60 * 1000 });
-                res.status(200).json({ accessToken: token });
-                res.send();
+                res.status(200).json({ accessToken: token, uid: uid });
             }
             else {
                 res.status(401).json({ message: 'creds:User or Password invalid.' });

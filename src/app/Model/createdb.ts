@@ -16,17 +16,17 @@ const runSqlFile = async (filePath: string) => {
 
     
     const file = fs.readFileSync(filePath);
-    const querries =  file.toString().split(';');
+    const queries =  file.toString().split(';');
     
-    for (const querry of querries) {
-        if (querry.trim() === '') continue;
-        await db_pool.query(querry).then(
+    for (const query of queries) {
+        if (query.trim() === '') continue;
+        await db_pool.query(query).then(
             (result) => {
-                console.log('querry success:');
+                console.log('query success:');
             }
         ).catch(
             (err) => {
-                console.log('querry failed:', err.code);
+                console.log('query failed:', err.code);
             }
         );
     }

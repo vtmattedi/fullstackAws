@@ -36,7 +36,7 @@ const getUsers =  async () => {
 const searchUser = async (username: String) => {
     const searchTerm = `${username}`;
     const [user] = await db_pool.query("SELECT * FROM users WHERE username LIKE CONCAT('%', ?, '%')", [searchTerm]) as Array<any>;
-    return user;
+    return user.map((user:any) => new User(user.id, user.username, user.password, user.email, user.created_at));
 }
 
 //Creates a user
@@ -66,7 +66,6 @@ const modifyUser = async (id: Number, username: String, email: String) => {
     return result.affectedRows > 0;
 }
 
-///Deletes a user
 const deleteUser = async (id: Number) => {
     const [result] = await db_pool.query('DELETE FROM users WHERE id = ?', [id]) as any;
     UsernameLookup.deleteUsername(id);

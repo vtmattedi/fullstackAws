@@ -23,13 +23,12 @@ allRouter.post("/api/newpost", authMiddleware, postController.handleCreatePost);
 allRouter.put("/api/editpost", authMiddleware, postController.handleEditPost);
 allRouter.delete("/api/deletepost", authMiddleware, postController.handleDeletePost);
 allRouter.get("/api/posts",authMiddleware, postController.getPostsByUserId);
-allRouter.get("/api/post/:id",authMiddleware, postController.getPostsByUserId);
+allRouter.get("/api/posts/:id",authMiddleware, postController.getPostsByUserId);
 allRouter.get("/api/allposts",authMiddleware, postController.getAllPosts);
 
 /*User Requests*/
 allRouter.get("/api/dashboard", authMiddleware, dataController.handleUserById);
 allRouter.post("/api/edituser", authMiddleware, dataController.handleEditUser);
-allRouter.get("/api/finduser/:id",authMiddleware, dataController.getUser)
 allRouter.get("/api/finduser",authMiddleware, dataController.getUser);
 allRouter.get("/api/userinfo/:id",authMiddleware, dataController.handleUserInfoById)
 

@@ -24,7 +24,7 @@ class DataController {
     };
 
 
-    
+
     /**
      * Handles requests to get information about other users.
      * 
@@ -83,7 +83,9 @@ class DataController {
             res.status(404).send({ message: 'User not found' });
             return;
         }
-        const { username, email } = req.body;
+        const { username, _email } = req.body;
+       
+        const email = _email ? (_email as string).toLowerCase(): undefined;
         if (!username && !email) {
             res.status(400).send({ message: 'Username or email are required' });
             return;
@@ -105,6 +107,16 @@ class DataController {
             res.status(400).send({ message: userNameValidation.message });
             return;
         }
+        if (username === user.user.username && email === user.user.email) {
+            res.status(400).send({ message: 'No changes detected' });
+            return;
+        }
+        /// if using test user reverse the changes after 1 hour
+        if (user.user.email === 'test@tes.com') {
+            setTimeout(() => {
+                modifyUser(userId, "Testuser", user.user.email);
+            }, 60*60*1000);
+        }
         const result = await modifyUser(userId, username || user.user.username, email || user.user.email);
         if (result) {
             res.status(200).send({ message: 'User updated' });
@@ -121,22 +133,19 @@ class DataController {
     * @param res - The response object used to send the response.
     */
     getUser = async (req: Request, res: Response) => {
-
-        const user_search = req.url.substring(req.url.lastIndexOf('/') + 1);
+        const user_search = req.query.searchTerm as string;
         if (!user_search || user_search.length < 2) {
             res.status(200).send({ users: [] });
             return;
         }
         const users = await searchUser(user_search) as Array<User>;
         res.status(200).send({
-            users: users.map((user) => {
-                return { user: user.username, email: user.email, id: user.id, created_at: user.created_at };
-            })
+            users: users.map((user) => { return user.toWebSafe(); })
         });
     }
 
 
-    
+
 }
 
 export const dataController = new DataController();

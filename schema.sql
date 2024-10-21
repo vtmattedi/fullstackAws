@@ -24,3 +24,5 @@ CREATE Table IF NOT EXISTS posts (
     user_id INT,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+UPDATE users SET username = 'testuser' WHERE email = 'test@test.com';

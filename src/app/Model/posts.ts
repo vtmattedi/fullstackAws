@@ -48,8 +48,8 @@ const deletePostById = async (id: Number) => {
 }
 
 // Get all posts by a user
-const getPostsByUserId = async (user_id: Number) => {
-    const [posts] = await db_pool.query('SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC', [user_id]) as Array<any>;
+const getPostsByUserId = async (user_id: Number, size: number) => {
+    const [posts] = await db_pool.query('SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC LIMIT ?', [user_id, size]) as Array<any>;
     return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
 }
 

@@ -199,21 +199,27 @@ class PostController {
      */
     getPostsByUserId = async (req: Request, res: Response) => {
         const { uid } = req.body;
-        let targetid = parseInt(req.params.id);
-        const path = req.url;
-
-        const num = parseInt(path.substring(1));
-        if (!isNaN(num)) {
+        const num = parseInt(req.params.id);
+        const size = parseInt(req.query.size as string);
+      //  console.log('get posts:',req.params ,req.query);
+        const finalSize = (isNaN(size) || size < 1)? 100 : size;
+        let targetid = uid;
+        if (!isNaN(num) && num > 0) {
             targetid = num;
         }
-        ;
+     //   console.log('get posts:',targetid, finalSize);
         if (targetid) {
-            const posts = await Posts.getPostsByUserId(targetid);
+            const posts = await Posts.getPostsByUserId(targetid, finalSize);
             res.status(200).send({ posts });
             return;
         }
-        const posts = await Posts.getPostsByUserId(uid);
-        res.status(200).send({ posts });
+        try {
+            const posts = await Posts.getPostsByUserId(uid, finalSize);
+            res.status(200).send({ posts });
+        }
+        catch (err) {
+            res.status(500).send({ message: 'Internal Server Error' });
+        }
     }
 
     /**
@@ -229,13 +235,14 @@ class PostController {
      */
     getAllPosts = async (req: Request, res: Response) => {
         const { size } = req.query;
-        if (size) {
-            const posts = await Posts.getAllPosts(parseInt(size as string));
+        const num = parseInt(size as string);
+        try {
+            const posts = await Posts.getAllPosts((isNaN(num)||num ===0) ? num:100);
             res.status(200).send({ posts });
-            return;
         }
-        const posts = await Posts.getAllPosts();
-        res.status(200).send({ posts });
+        catch (err) {
+            res.status(500).send({ message: 'Internal Server Error' });
+        }
     }
 
     /**
@@ -253,6 +260,7 @@ class PostController {
     */
     getNewPosts = async (req: Request, res: Response) => {
         const { targetId, lastId } = req.query;
+
         if (targetId && lastId) {
             const posts = await Posts.getNewPostsByUserId(parseInt(targetId as string), parseInt(lastId as string));
             res.status(200).send({ posts: posts, deleted: deletedPostsId.map((post) => post.id) });

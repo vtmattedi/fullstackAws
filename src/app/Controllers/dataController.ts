@@ -23,8 +23,6 @@ class DataController {
             res.status(200).send({ user: user.user.username, email: user.user.email, id: user.user.id, created_at: user.user.created_at });
     };
 
-
-
     /**
      * Handles requests to get information about other users.
      * 
@@ -83,16 +81,16 @@ class DataController {
             res.status(404).send({ message: 'User not found' });
             return;
         }
-        const { username, _email } = req.body;
+        const { username, email } = req.body;
        
-        const email = _email ? (_email as string).toLowerCase(): undefined;
-        if (!username && !email) {
+        const _email = email ? (email as string).toLowerCase(): undefined;
+        if (!username && !_email) {
             res.status(400).send({ message: 'Username or email are required' });
             return;
         }
-        if (email) {
-            const find_res = await getUsersByEmail(email);
-            const emailValidation = Asserter.email(email);
+        if (_email) {
+            const find_res = await getUsersByEmail(_email);
+            const emailValidation = Asserter.email(_email);
             if (find_res.found && find_res.user[0].id !== userId) {
                 res.status(400).send({ message: 'Email already registered' });
                 return;
@@ -107,7 +105,7 @@ class DataController {
             res.status(400).send({ message: userNameValidation.message });
             return;
         }
-        if (username === user.user.username && email === user.user.email) {
+        if (username === user.user.username && _email === user.user.email) {
             res.status(400).send({ message: 'No changes detected' });
             return;
         }

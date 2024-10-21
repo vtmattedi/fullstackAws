@@ -42,19 +42,19 @@ class AuthController {
         }
 
         //console.log(process.env);
-        const { username, password, _email } = req.body;
+        const { username, password, email } = req.body;
 
-        if (!username || !password || !_email) {
-            res.status(400).json({ message: 'Username and password and email are required' });
+        if (!username || !password || !email) {
+            res.status(400).json({ message: 'email:Username and password and email are required' });
             res.send();
             return;
         }
 
-        const email = (_email as string).toLowerCase();
+        const _email = (email as string).toLowerCase();
 
 
         try {
-            const users = await getUsersByEmail(email);
+            const users = await getUsersByEmail(_email);
             // Check if email is already registered
             if (users.found) {
                 res.status(409).json({ message: 'email:Email already registered.' });
@@ -62,7 +62,7 @@ class AuthController {
             }
 
             // Check if email, password and username are valid
-            const emailCheck = Asserter.email(email);
+            const emailCheck = Asserter.email(_email);
             const passwordCheck = Asserter.password(password);
             const usernameCheck = Asserter.username(username);
 

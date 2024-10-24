@@ -25,15 +25,16 @@ class Post {
 
 // Create a post
 const createPost = async (title: String, content: String, user_id: Number) => {
-    const [result] = await sql('INSERT INTO posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING *', [title, content, user_id]) as any;
-    return (result.id);
+    const [result] = await sql('INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)', [title, content, user_id]) as any;
+    return (result.insertId);
 };
 
 // Delete a post
 const deletePostById = async (id: Number) => {
     try {
-        const res = await sql('DELETE FROM posts WHERE id = $1 RETURNING *', [id]) as Array<any>;
+        const [res] = await sql('DELETE FROM posts WHERE id = ?', [id]) as Array<any>;
         {
+      
             if (res.length === 0) {
                 return false;
             }
@@ -48,14 +49,14 @@ const deletePostById = async (id: Number) => {
 
 // Get all posts by a user
 const getPostsByUserId = async (user_id: Number, size: number) => {
-    const posts = await sql('SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2', [user_id, size]) as Array<any>;
+    const [posts] = await sql('SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC LIMIT ?', [user_id, size]) as Array<any>;
     return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
 }
 
 // Get a post by its post id
 const getPostById = async (id: Number) => {
     try {
-        const post = await sql('SELECT * FROM posts WHERE id = $1', [id]) as Array<any>;
+        const [post] = await sql('SELECT * FROM posts WHERE id = ?', [id]) as Array<any>;
         return { found: post.length > 0, post: Post.createPostWithUsername(post[0]) };
     }
     catch (err) {
@@ -65,9 +66,9 @@ const getPostById = async (id: Number) => {
 }
 
 // Get all posts
-const getAllPosts = async (size: Number) => {
+const getAllPosts = async (size?: Number) => {
     {
-        const posts = await sql('SELECT * from posts ORDER BY created_at DESC LIMIT $1', [size]) as Array<any>;
+        const [posts] = await sql('SELECT * from posts ORDER BY created_at DESC LIMIT ?', [size]) as Array<any>;
         return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
     }
 }
@@ -75,7 +76,7 @@ const getAllPosts = async (size: Number) => {
 // Get new posts
 const getNewPosts = async (lastId?: Number) => {
     {
-        const posts = await sql('SELECT * from posts WHERE id > $1 ORDER BY created_at DESC', [lastId || 0]) as Array<any>;
+        const [posts] = await sql('SELECT * from posts WHERE id > ? ORDER BY created_at DESC', [lastId]) as Array<any>;
         return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
     }
 }
@@ -83,15 +84,15 @@ const getNewPosts = async (lastId?: Number) => {
 // Get new posts by a user
 const getNewPostsByUserId = async (user_id: Number, lastId?: Number) => {
     {
-        const posts = await sql('SELECT * from posts WHERE id > $1 AND user_id = $2 ORDER BY created_at DESC', [lastId || 0, user_id]) as Array<any>;
+        const [posts] = await sql('SELECT * from posts WHERE id > ? AND user_id = ? ORDER BY created_at DESC', [lastId, user_id]) as Array<any>;
         return posts.map((post: any) => ({ ...post, username: UsernameLookup.getUsername(post.user_id) }));
     }
 }
 
 // Edit a post
 const editpost = async (id: Number, title: String, content: String) => {
-    const result = await sql('UPDATE posts SET title = $1, content = $2 WHERE id = $3 RETURNING *', [title, content, id]) as any;
-    return (result.length > 0);
+    const [result] = await sql('UPDATE posts SET title = ?, content = ? WHERE id = ?', [title, content, id]) as any;
+    return (result.affectedRows > 0);
 }
 
 export { createPost, deletePostById, getPostsByUserId, Post, getPostById, getAllPosts, getNewPosts, getNewPostsByUserId, editpost};

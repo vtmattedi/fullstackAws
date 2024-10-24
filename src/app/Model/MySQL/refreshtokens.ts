@@ -4,7 +4,7 @@ import { sql } from './db';
 // Create a token
 const createToken = async (token: String, user_id: Number) => {
    try {
-       const res = await sql('INSERT INTO refreshTokens (token, user_id) VALUES ($1, $2) RETURNING *', [token, user_id]);
+       const res = await sql('INSERT INTO refreshTokens (token, user_id) VALUES (?, ?)', [token, user_id]);
        return true;
     } catch (error) {
         console.log(error);
@@ -15,10 +15,10 @@ const createToken = async (token: String, user_id: Number) => {
 
 // Delete a token
 const deleteToken = async (token: String) => {
-    return sql('DELETE FROM refreshTokens WHERE token = $1 RETURNING *', [token]).then(() => {
+    return sql('DELETE FROM refreshTokens WHERE token = ?', [token]).then((result) => {
         return true;
-    }).catch(() => {
-        console.log();
+    }).catch((err) => {
+        console.log(err);
       return false;
     }
     );
@@ -28,8 +28,8 @@ const deleteToken = async (token: String) => {
 const deleteTokenByUserId = async (user_id: Number) => {
     
     try {
-        const res = await sql('DELETE FROM refreshTokens WHERE user_id = $1 RETURNING *', [user_id]) as Array<any>;
-        return res.length;
+        const [res] = await sql('DELETE FROM refreshTokens WHERE user_id = ?', [user_id]) as Array<any>;
+        return res.affectedRows;
     } catch (error) {
         console.log(error);
         return 0;
@@ -40,7 +40,7 @@ const deleteTokenByUserId = async (user_id: Number) => {
 //Check if a token is valid (exists in the database)
 const isTokenValid = async (token: String) => {
   try {
-    const res = await sql('SELECT * FROM refreshTokens WHERE token = $1', [token]) as Array<any>;
+    const [res] = await sql('SELECT * FROM refreshTokens WHERE token = ?', [token]) as Array<any>;
       return res.length > 0;
   } catch (error) {
         console.log(error);

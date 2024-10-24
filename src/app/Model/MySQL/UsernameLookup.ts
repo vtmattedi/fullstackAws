@@ -13,7 +13,7 @@ export class UsernameLookup {
     */
     static async loadUsernames() {
         try {
-            const users = await sql('SELECT * FROM users') as Array<any>;
+            const [users] = await sql('SELECT * FROM users') as Array<any>;
             for (const user of users) {
                 UsernameLookup.addUsername(user.id, user.username);
             }

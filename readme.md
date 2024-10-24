@@ -1,7 +1,6 @@
 <h1 align="center" style="font-weight: Bold">:desktop_computer: Fullstack posts application </h1>
 
-This is a project that showcases a fullstack application that integrates a MVC pattern, a AWS RDS database and a React front-end.
-
+This is a project that showcases a fullstack application that integrates a MVC pattern, a ~~AWS~~ Neon RDS database and a React front-end.
 
 <div style="display:flex; flex-direction: row; align-content: center; gap: 5px; align-items: center;">
 <img src="https://img.shields.io/website.svg?down_color=red&down_message=down&up_color=green&up_message=up&url=http%3A%2F%2Fcv.lbesson.qc.to" align=center></img>
@@ -10,7 +9,9 @@ This project is currently been host on render you can check out the project depl
 <a href="https://fullstackaws.onrender.com/">Here</a>.</p>
 </div>
 
-The app, is a network example where you can check a global feed in real time, post content, edit content and see other users posts. It implements JWT authentication with session based refresh tokens and access tokens.
+The app, is a network example where you can check a global feed in real time, post content, edit content and see other users posts. It implements JWT authentication with session based refresh tokens and access tokens. It connects to a postgress database (currently using neon).
+
+It originally used AWS and its MySQL database however, the only options was to have a ipv4 to access that Database and it is not cover under the free tier, so after a month I switched to neon's postgress solution. 
 
 Some of the feature you will find on this project:
 
@@ -21,10 +22,10 @@ Some of the feature you will find on this project:
 - See a global feed of all posts in real time.
 - Secure session with JWT tokens.
 - Logout from everywhere feature.
-- AWS integration, using AuroraMySQL RDS service.
+- ~~AWS integration, using MySQL RDS service.~~
+- Neon Postgress DB
 - Fully responsive website. (Check it out on your phone and on desktop).
 - Light/Dark Theme that persists per user per device.
-
 
 Check out the front-end project [Here](https://github.com/vtmattedi/fullstackAwsfront).
 
@@ -49,7 +50,7 @@ The token contains only the user ID (uid) for whom it was issued.
 
 * At login or after sign up, the user is issued an access token and a cookie is set with a refresh token (httponly, secure).
 * The user must provide the access token on every api call using the 'Bearer' header, but there is no need to send the refresh token cookie.
-* The access token is set to be only 15 seconds. 
+* The access token is set to be only 15 seconds.
 * The user can solicitate a new access token using the refresh token cookie.
 * For logout/delete account the user must provide the cookie.
 * Once the user logs out the refresh token is invalidated. If the user chooses to logout from everywhere, the application invalidates all refresh tokens issued to that account.
@@ -69,7 +70,7 @@ and then serve the build folder. Unfortunately, render's free tier have limited 
 
 When the useAxiosJwt is used, in case of failure due to code 401: not authorized, it will automaticaly request a new token and retry the request.
 
-For more information about the front-end app check its own [repository]("https://github.com/vtmattedi/fullstackawsfront").
+For more information about the front-end app check its own [repository]().
 
 ## 🖱️Running the app:
 
@@ -161,6 +162,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -203,6 +205,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -245,6 +248,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -287,6 +291,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -329,6 +334,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -376,6 +382,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details></details>
 <br>
@@ -436,6 +443,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 <details>
@@ -444,16 +452,17 @@ The original idea was to have mulitple servers: one only for authentication, one
 <code>/api/posts/:id</code>
 </summary>
 
-- **Expects**: 
-    * User ID in the URL path (optional, if missing will default to user's id. Anything other than positive numbers are treated as missing).
-    * Size in the URL parameters (optional, if missing will default to 100.
+- **Expects**:
+
+  * User ID in the URL path (optional, if missing will default to user's id. Anything other than positive numbers are treated as missing).
+  * Size in the URL parameters (optional, if missing will default to 100.
     Anything other than positive numbers are treated as missing).
 - **Returns**: Posts from the target id with a maximum of the requested size.
-
 - **Example**:
-    * <code>/api/posts?size=100</code> -> Gets the last 100 posts of the uid present in the accessToken.
-    * <code>/api/posts/10?size=30</code> -> Gets the last 30 posts of user with uid = 10.
-     * <code>/api/posts/10?size=j</code> -> Gets the last 100 posts of user with uid = 10.
+
+  * `<code>`/api/posts?size=100 `</code>` -> Gets the last 100 posts of the uid present in the accessToken.
+  * `<code>`/api/posts/10?size=30 `</code>` -> Gets the last 30 posts of user with uid = 10.
+  * `<code>`/api/posts/10?size=j `</code>` -> Gets the last 100 posts of user with uid = 10.
 
 > <details>
 > <summary><b><i>Check the response table</b></i></summary>
@@ -480,14 +489,9 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
-
-
-
-
-
-
 
 <details>
 <summary>
@@ -495,9 +499,9 @@ The original idea was to have mulitple servers: one only for authentication, one
 <code>/api/newposts</code>
 </summary>
 
-- **Expects**: 
-    * A <code>lastId</code> in the URL parameters.
-    * A <code>targetId</code> in the URL parameters. (optional, if not present will be defaulted to all users)  
+- **Expects**:
+  * A `<code>`lastId `</code>` in the URL parameters.
+  * A `<code>`targetId `</code>` in the URL parameters. (optional, if not present will be defaulted to all users)
 - **Returns**: An array of posts created after the last id provided (from the target id if provided) and an array of the deleted post IDs in the last 10 minutes.
 
 > <details>
@@ -525,6 +529,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -567,6 +572,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -619,6 +625,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -666,6 +673,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -708,6 +716,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -750,6 +759,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -782,6 +792,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 <details>
@@ -790,7 +801,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 <code>/api/userinfo/:id</code>
 </summary>
 
-- **Expects**: `userid` as a URL path. 
+- **Expects**: `userid` as a URL path.
 - **Returns**: Information about a specific user if found.
 
 > <details>
@@ -823,6 +834,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -839,7 +851,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 </summary>
 
 - **Info**: Health check route.
-- **Expects**: Nothing. 
+- **Expects**: Nothing.
 - **Returns**: OK if server if live.
 
 > <details>
@@ -858,10 +870,11 @@ The original idea was to have mulitple servers: one only for authentication, one
 >             <td>${\color{green}\textbf{200}}$</td>
 >             <td><code> "Server is live."</code></td>
 >             <td>Should always respond with code 200.</td>
->         </tr>        
+>         </tr>    
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -871,7 +884,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 <code>/</code>
 </summary>
 
-- **Expects**: Nothing. 
+- **Expects**: Nothing.
 - **Returns**: The HTML for the index page.
 
 > <details>
@@ -890,10 +903,11 @@ The original idea was to have mulitple servers: one only for authentication, one
 >             <td>${\color{green}\textbf{200}}$</td>
 >             <td><code>HTML file</code></td>
 >             <td>Serves the front-end app.</td>
->         </tr>        
+>         </tr>    
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -904,7 +918,7 @@ The original idea was to have mulitple servers: one only for authentication, one
 </summary>
 
 - **Info**: static files for the front-end app.
-- **Expects**: Nothing. 
+- **Expects**: Nothing.
 - **Returns**: The file if it exists.
 
 > <details>
@@ -923,10 +937,11 @@ The original idea was to have mulitple servers: one only for authentication, one
 >             <td>${\color{green}\textbf{200}}$</td>
 >             <td><code> The file if it exists in the proper folder.</code></td>
 >             <td>Should always respond with code 200.</td>
->         </tr>        
+>         </tr>    
 >     </tbody>
 > </table>
 > </details>
+
 <hr>
 </details>
 
@@ -940,18 +955,6 @@ Others
 
 </details>
 
-
 </details>
 
-
-
 ## Used Tecnologies:
-
-![React](https://img.shields.io/badge/React-3B5966?style=for-the-badge&logo=react&logoColor=61DAFB)
-![bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
-![node](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-![Express](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
-![mysql](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
-![aws](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
-![JWT](https://img.shields.io/badge/json%20web%20tokens-323330?style=for-the-badge&logo=json-web-tokens&logoColor=pink)
----

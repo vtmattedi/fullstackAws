@@ -21,11 +21,11 @@ const runSqlFile = async (filePath: string) => {
     for (const query of queries) {
         if (query.trim() === '') continue;
         await sql(query).then(
-            () => {
+            (result) => {
                 console.log('query success:');
             }
         ).catch(
-            (err:any) => {
+            (err) => {
                 console.log('query failed:', err.code);
             }
         );

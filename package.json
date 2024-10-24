@@ -19,8 +19,6 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
     "neon": "^2.0.0",
-    "sequelize": "^6.37.4",
-    "sqlite3": "^5.1.7",
     "tsx": "^4.19.1"
   },
   "type": "module",

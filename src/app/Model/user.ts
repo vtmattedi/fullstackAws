@@ -35,7 +35,7 @@ const getUsers =  async () => {
 //Searches for a user by username
 const searchUser = async (username: String) => {
     const searchTerm = `${username}`;
-    const user = await sql("SELECT * FROM users WHERE username LIKE CONCAT('%', $1, '%')", [searchTerm]) as Array<any>;
+    const user = await sql("SELECT * FROM users WHERE username LIKE '%' || $1 || '%'", [username]) as Array<any>;
     return user.map((user:any) => new User(user.id, user.username, user.password, user.email, user.created_at));
 }
 

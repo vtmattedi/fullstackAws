@@ -402,7 +402,7 @@ The original idea was to have mulitple servers: one only for authentication, one
         <th>Body</th>
         <th>Description</th>
     </tr>
-<td>${\color{green}\textbf{401}}$</td>
+<td>${\color{red}\textbf{401}}$</td>
 <td><code>{error: string}</code></td>
 <td>Not Authenticated</td>
 </tr>

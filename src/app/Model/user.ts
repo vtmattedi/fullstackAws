@@ -40,7 +40,7 @@ const searchUser = async (username: String) => {
 
 //Creates a user
 const createUser = async (username: String, password: String, email:String) => {
-    const [result] = await sql('INSERT INTO users (id, username, password, email) VALUES ($1, $2, $3, $4) RETURNING *', [UsernameLookup.MAXID + 1, username, password, email]) as any;
+    const [result] = await sql('INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *', [username, password, email]) as any;
     UsernameLookup.addUsername(result.id, username);
     return (result.id);
 }
@@ -59,13 +59,13 @@ const getUserById = async (id: Number) => {
 }
 
 //Modifies a user
-const modifyUser = async (id: number, username: String, email: String) => {
+const modifyUser = async (id: Number, username: String, email: String) => {
     const result = await sql('UPDATE users SET username = $1, email = $2 WHERE id = $3 RETURNING *', [username, email, id]) as any;
     UsernameLookup.editUsername(id,username);
     return result.length > 0;
 }
 
-const deleteUser = async (id: number) => {
+const deleteUser = async (id: Number) => {
     const result = await sql('DELETE FROM users WHERE id = $1 RETURNING *', [id]) as any;
     UsernameLookup.deleteUsername(id);
     return result.length > 0;

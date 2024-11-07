@@ -186,11 +186,15 @@ class AuthController {
                     const delRes = await deleteToken(refreshToken);
                     console.log("token expired:", refreshToken, "deletion:", delRes);
                     res.status(401).send({ message: 'Refresh token expired.' });
+                    return ;
                 }
                 else
+                {
                     console.log("Invalid decode for token: ", refreshToken);
-                res.status(401).send({ message: 'Invalid refresh token.' });
-                return;
+                    res.status(401).send({ message: 'Invalid refresh token.' });
+                    return;
+                }
+              
             }
             const { uid } = decoded;
             const tokenValid = await isTokenValid(refreshToken);

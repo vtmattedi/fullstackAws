@@ -19,8 +19,8 @@ export class UsernameLookup {
             }
             console.log("Loaded usernames from database");
         }
-        catch (err) {
-            console.log("Error Loading usernames from database");
+        catch (err: any) {
+            console.log("Error Loading usernames from database" ,err.message);
         }
     }
 

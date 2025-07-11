@@ -17,16 +17,18 @@ const runSqlFile = async (filePath: string) => {
     
     const file = fs.readFileSync(filePath);
     const queries =  file.toString().split(';');
-    
+    let i = 0;
+    console.log('Running SQL file:', filePath);
     for (const query of queries) {
+        i++;
         if (query.trim() === '') continue;
         await sql(query).then(
             () => {
-                console.log('query success:');
+                console.log(`query ${i} success`,  );
             }
         ).catch(
             (err:any) => {
-                console.log('query failed:', err.code);
+                console.log(`query ${i} failed:`, err.code);
             }
         );
     }
